@@ -13,7 +13,7 @@ namespace SMProxy
     {
         static TcpListener Listener;
         static bool ClientDirty = false, ServerDirty = false;
-        static bool SuppressServer = false, SuppressClient = false, FilterOutput = false;
+        static bool SuppressServer = false, SuppressClient = false, FilterOutput = false, EnableProfiling = false;
         static string OutputFile = "output.txt", ServerAddress = null;
         static List<byte> Filter = new List<byte>();
         static int LocalPort = 25564, RemotePort = 25565;
@@ -28,7 +28,8 @@ namespace SMProxy
                 "\t[filter] is a comma-delimited list of packet IDs, in hex.\n" +
                 "\tExample: -f 01,02 would restrict output to handshake and login packets.\n" +
                 "-sc: Suppress client.  Suppresses logging for client->server packets.\n" +
-                "-ss: Suppress server.  Suppresses logging for server->client packets.");
+                "-ss: Suppress server.  Suppresses logging for server->client packets.\n" +
+                "-ep: Enable profiling.  Logs speed of transmission.");
         }
 
         static void Main(string[] args)
@@ -67,6 +68,9 @@ namespace SMProxy
                         break;
                     case "-ss":
                         SuppressServer = true;
+                        break;
+                    case "-ep":
+                        EnableProfiling = true;
                         break;
                     default:
                         DisplayHelp();
@@ -116,6 +120,8 @@ namespace SMProxy
             {
                 if (client.Available != 0)
                 {
+                    DateTime downloadStartTime = DateTime.Now;
+
                     int data = client.GetStream().ReadByte();
                     if (data == -1)
                         break;
@@ -302,16 +308,22 @@ namespace SMProxy
                         }
                         finally
                         {
+                            DateTime downloadCompleteTime = DateTime.Now;
+                            DateTime uploadStartTime = DateTime.Now;
                             if (server.Connected)
                             {
                                 server.GetStream().WriteByte((byte)data);
                                 server.GetStream().Write(pr.Payload, 0, pr.Payload.Length);
                             }
+                            LogProfiling(outputLogger, downloadStartTime, downloadCompleteTime, uploadStartTime, true,
+                                (byte)data, pr);
                         }
                     }
                 }
                 if (server.Connected && client.Connected && server.Available != 0)
                 {
+                    DateTime downloadStartTime = DateTime.Now;
+
                     int data = server.GetStream().ReadByte();
                     if (data == -1)
                         break;
@@ -787,11 +799,15 @@ namespace SMProxy
                         }
                         finally
                         {
+                            DateTime downloadCompleteTime = DateTime.Now;
+                            DateTime uploadStartTime = DateTime.Now;
                             if (client.Connected)
                             {
                                 client.GetStream().WriteByte((byte)data);
                                 client.GetStream().Write(pr.Payload, 0, pr.Payload.Length);
                             }
+                            LogProfiling(outputLogger, downloadStartTime, downloadCompleteTime, uploadStartTime, false,
+                                (byte)data, pr);
                         }
                     }
                 }
@@ -825,6 +841,25 @@ namespace SMProxy
                     sw.WriteLine("\t" + args[i].ToString() + " (" + args[i + 1].GetType().Name + "): " + args[i + 1]);
             }
             sw.Flush();
+        }
+
+        static void LogProfiling(StreamWriter sw, DateTime downloadStartTime, DateTime downloadCompleteTime,
+            DateTime uploadStartTime, bool ClientToServer, byte Packet, PacketReader pr)
+        {
+            if (ClientToServer && SuppressClient)
+                return;
+            if (!ClientToServer && SuppressServer)
+                return;
+            if (FilterOutput && !Filter.Contains(Packet))
+                return;
+            DateTime uploadCompleteTime = DateTime.Now;
+            string output = "\tProfiling: Size: " + pr.Payload.Length + "; down: " +
+                (downloadCompleteTime - downloadStartTime).TotalMilliseconds + " ms (" +
+                (pr.Payload.Length / (downloadCompleteTime - downloadStartTime).TotalSeconds) + " bytes/sec); up: " +
+                (uploadCompleteTime - uploadStartTime).TotalMilliseconds + " ms (" +
+                (pr.Payload.Length / (uploadCompleteTime - uploadStartTime).TotalSeconds) + " bytes/sec); Proxy lag: " +
+                ((uploadCompleteTime - downloadStartTime) - (downloadStartTime - downloadCompleteTime)).TotalMilliseconds + " ms";
+            sw.WriteLine(output);
         }
 
         static string DumpArray(byte[] resp)
