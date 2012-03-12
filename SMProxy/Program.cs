@@ -93,7 +93,7 @@ namespace SMProxy
             {
                 string values = "";
                 foreach (byte b in Filter)
-                    values += "0x" + b + ",";
+                    values += "0x" + b.ToString("x") + ",";
                 outputLogger.WriteLine("Output filter: " + values.Remove(values.Length - 1));
             }
             if (SuppressClient)
