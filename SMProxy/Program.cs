@@ -87,7 +87,7 @@ namespace SMProxy
 
             outputLogger.WriteLine("SMProxy: Log opened at " + DateTime.Now.ToLongTimeString());
             outputLogger.WriteLine("Proxy parameters:");
-            outputLogger.WriteLine("Local Endpoint: 127.0.0.1" + LocalPort);
+            outputLogger.WriteLine("Local Endpoint: 127.0.0.1:" + LocalPort);
             outputLogger.WriteLine("Remote Endpoint: " + ServerAddress + ":" + RemotePort);
             if (FilterOutput)
             {
