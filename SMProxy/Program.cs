@@ -418,6 +418,14 @@ namespace SMProxy
                                         "Z", pr.ReadInt(),
                                         "Face", pr.ReadByte());
                                     break;
+                                case 0x11: // Use Bed
+                                    LogPacket(outputLogger, false, 0x11, pr,
+                                        "Entity ID", pr.ReadInt(),
+                                        "In Bed?", pr.ReadByte(),
+                                        "X", pr.ReadInt(),
+                                        "Y", pr.ReadByte(),
+                                        "Z", pr.ReadInt());
+                                    break;
                                 case 0x12: // Animation
                                     LogPacket(outputLogger, false, 0x12, pr,
                                         "Entity ID", pr.ReadInt(),
