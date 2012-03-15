@@ -13,9 +13,10 @@ namespace SMProxy
     {
         static TcpListener Listener;
         static bool ClientDirty = false, ServerDirty = false;
-        static bool SuppressServer = false, SuppressClient = false, FilterOutput = false, EnableProfiling = false;
+        static bool SuppressServer = false, SuppressClient = false, FilterOutput = false, IgnoreFilterOutput = false, EnableProfiling = false;
         static string OutputFile = "output.txt", ServerAddress = null;
         static List<byte> Filter = new List<byte>();
+        static List<byte> IgnoreFilter = new List<byte>();
         static int LocalPort = 25564, RemotePort = 25565;
         static Dictionary<byte, string> CustomClientPackets = new Dictionary<byte, string>();
         static Dictionary<byte, string> CustomServerPackets = new Dictionary<byte, string>();
@@ -29,6 +30,7 @@ namespace SMProxy
                 "-f [filter]: Logs only packets that match [filter].\n" +
                 "\t[filter] is a comma-delimited list of packet IDs, in hex.\n" +
                 "\tExample: -f 01,02 would restrict output to handshake and login packets.\n" +
+                "\tAlternatively, you can do -!f [filter] and the specified packets will not be logged.\n" +
                 "-sc: Suppress client.  Suppresses logging for client->server packets.\n" +
                 "-ss: Suppress server.  Suppresses logging for server->client packets.\n" +
                 "-ep: Enable profiling.  Logs speed of transmission.\n" +
@@ -73,6 +75,12 @@ namespace SMProxy
                         FilterOutput = true;
                         foreach (string s in args[i + 1].Split(','))
                             Filter.Add(byte.Parse(s, System.Globalization.NumberStyles.HexNumber));
+                        i++;
+                        break;
+                    case "-!f":
+                        IgnoreFilterOutput = true;
+                        foreach (string s in args[i + 1].Split(','))
+                            IgnoreFilter.Add(byte.Parse(s, System.Globalization.NumberStyles.HexNumber));
                         i++;
                         break;
                     case "-sc":
@@ -121,6 +129,13 @@ namespace SMProxy
                 foreach (byte b in Filter)
                     values += "0x" + b.ToString("x") + ",";
                 outputLogger.WriteLine("Output filter: " + values.Remove(values.Length - 1));
+            }
+            if (IgnoreFilterOutput)
+            {
+                string values = "";
+                foreach (byte b in IgnoreFilter)
+                    values += "0x" + b.ToString("x") + ",";
+                outputLogger.WriteLine("Ignored filter: " + values.Remove(values.Length - 1));
             }
             if (CustomClientPackets.Count != 0)
             {
@@ -371,8 +386,8 @@ namespace SMProxy
                                         break;
                                     default:
                                         ClientDirty = true;
-                                        Console.WriteLine("WARNING: Client send unrecognized packet!  Switching to raw log mode.");
-                                        outputLogger.WriteLine("WARNING: Client sent unrecognized packet!  Switching to raw log mode.");
+                                        Console.WriteLine("WARNING: Client send unrecognized packet (0x" + data.ToString("x") + ")!  Switching to raw log mode.");
+                                        outputLogger.WriteLine("WARNING: Client sent unrecognized packet (0x" + data.ToString("x") + ")!  Switching to raw log mode.");
                                         break;
                                 }
                             }
@@ -380,8 +395,8 @@ namespace SMProxy
                         catch
                         {
                             ClientDirty = true;
-                            Console.WriteLine("WARNING: Client sent unrecognized packet!  Switching to raw log mode.");
-                            outputLogger.WriteLine("WARNING: Client sent unrecognized packet!  Switching to raw log mode.");
+                            Console.WriteLine("WARNING: Client sent unrecognized packet (0x" + data.ToString("x") + ")!  Switching to raw log mode.");
+                            outputLogger.WriteLine("WARNING: Client sent unrecognized packet (0x" + data.ToString("x") + ")!  Switching to raw log mode.");
                         }
                         finally
                         {
@@ -949,6 +964,8 @@ namespace SMProxy
         static void LogPacket(StreamWriter sw, bool ClientToServer, byte PacketID, PacketReader pr, params object[] args)
         {
             if (FilterOutput && !Filter.Contains(PacketID))
+                return;
+            if (IgnoreFilterOutput && IgnoreFilter.Contains(PacketID))
                 return;
             if (ClientToServer && SuppressClient)
                 return;
