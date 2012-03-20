@@ -17,6 +17,8 @@ namespace SMProxy
         static string OutputFile = "output.txt", ServerAddress = null;
         static List<byte> Filter = new List<byte>();
         static List<byte> IgnoreFilter = new List<byte>();
+        static List<byte> ClientDenyPackets = new List<byte>();
+        static List<byte> ServerDenyPackets = new List<byte>();
         static int LocalPort = 25564, RemotePort = 25565;
         static Dictionary<byte, string> CustomClientPackets = new Dictionary<byte, string>();
         static Dictionary<byte, string> CustomServerPackets = new Dictionary<byte, string>();
@@ -30,7 +32,7 @@ namespace SMProxy
                 "-f [filter]: Logs only packets that match [filter].\n" +
                 "\t[filter] is a comma-delimited list of packet IDs, in hex.\n" +
                 "\tExample: -f 01,02 would restrict output to handshake and login packets.\n" +
-                "\tAlternatively, you can do -!f [filter] and the specified packets will not be logged.\n" +
+                "\tAlternatively, you can do -!f [filter] for the opposite behavior.\n" +
                 "-sc: Suppress client.  Suppresses logging for client->server packets.\n" +
                 "-ss: Suppress server.  Suppresses logging for server->client packets.\n" +
                 "-ep: Enable profiling.  Logs speed of transmission.\n" +
@@ -43,7 +45,10 @@ namespace SMProxy
                 "\t-ap EntityEquipment:S:05:int,short,short,short\n" +
                 "\tDo not use spaces in the packet name.\n" +
                 "\tValid data types:\n\tboolean, byte, short, int, long, float, double, string, and slot.\n\n" +
-                "\tCustom packets added with this flag will override the existing packet.");
+                "\tCustom packets added with this flag will override the existing packet.\n" +
+                "-sp [packet]:[direction],...: Suppresses a packet.  [packet] is a packet ID,\n" +
+                "\tand [direction] is any combination of 'C' and 'S', for which endpoint\n" + 
+                "\tto deny the packets to.");
         }
 
         static void Main(string[] args)
@@ -102,6 +107,18 @@ namespace SMProxy
                             CustomServerPackets.Add(id, parts[0] + ":" + parts[3]);
                         i++;
                         break;
+                    case "-sp":
+                        parts = args[i + 1].Split(',');
+                        foreach (string part in parts)
+                        {
+                            string[] subParts = part.Split(':');
+                            if (subParts[1].Contains("C"))
+                                ClientDenyPackets.Add(byte.Parse(subParts[0], System.Globalization.NumberStyles.HexNumber));
+                            if (subParts[1].Contains("S"))
+                                ServerDenyPackets.Add(byte.Parse(subParts[0], System.Globalization.NumberStyles.HexNumber));
+                        }
+                        i++;
+                        break;
                     default:
                         DisplayHelp();
                         return;
@@ -149,6 +166,20 @@ namespace SMProxy
                 foreach (var kvp in CustomServerPackets)
                     outputLogger.WriteLine("0x" + kvp.Key.ToString("x") + ":" + kvp.Value);
             }
+            if (ServerDenyPackets.Count != 0)
+            {
+                outputLogger.Write("Suppressing packets from server: ");
+                foreach (var packet in ServerDenyPackets)
+                    outputLogger.Write(packet.ToString("x") + ",");
+                outputLogger.WriteLine();
+            }
+            if (ClientDenyPackets.Count != 0)
+            {
+                outputLogger.Write("Suppressing packets from client: ");
+                foreach (var packet in ClientDenyPackets)
+                    outputLogger.Write(packet.ToString("x") + ",");
+                outputLogger.WriteLine();
+            }
             if (SuppressClient)
                 outputLogger.WriteLine("Suppressing client->server output");
             if (SuppressServer)
@@ -187,6 +218,7 @@ namespace SMProxy
                     else
                     {
                         PacketReader pr = new PacketReader(client);
+                        bool suppressed = ServerDenyPackets.Contains((byte)data);
                         try
                         {
                             if (CustomClientPackets.ContainsKey((byte)data))
@@ -402,7 +434,7 @@ namespace SMProxy
                         {
                             DateTime downloadCompleteTime = DateTime.Now;
                             DateTime uploadStartTime = DateTime.Now;
-                            if (server.Connected)
+                            if (server.Connected && !suppressed)
                             {
                                 server.GetStream().WriteByte((byte)data);
                                 server.GetStream().Write(pr.Payload, 0, pr.Payload.Length);
@@ -432,6 +464,7 @@ namespace SMProxy
                     else
                     {
                         PacketReader pr = new PacketReader(server);
+                        bool suppressed = ClientDenyPackets.Contains((byte)data);
                         try
                         {
                             if (CustomServerPackets.ContainsKey((byte)data))
@@ -944,7 +977,7 @@ namespace SMProxy
                         {
                             DateTime downloadCompleteTime = DateTime.Now;
                             DateTime uploadStartTime = DateTime.Now;
-                            if (client.Connected)
+                            if (client.Connected && !suppressed)
                             {
                                 client.GetStream().WriteByte((byte)data);
                                 client.GetStream().Write(pr.Payload, 0, pr.Payload.Length);
@@ -963,6 +996,8 @@ namespace SMProxy
 
         static void LogPacket(StreamWriter sw, bool ClientToServer, byte PacketID, PacketReader pr, params object[] args)
         {
+            bool Suppressed = (ClientToServer && ClientDenyPackets.Contains(PacketID)) ||
+                              (!ClientToServer && ServerDenyPackets.Contains(PacketID));
             if (FilterOutput && !Filter.Contains(PacketID))
                 return;
             if (IgnoreFilterOutput && IgnoreFilter.Contains(PacketID))
@@ -972,10 +1007,10 @@ namespace SMProxy
             if (!ClientToServer && SuppressServer)
                 return;
             if (ClientToServer)
-                sw.WriteLine("{" + DateTime.Now.ToLongTimeString() + "} [CLIENT->SERVER]: " +
+                sw.WriteLine("{" + DateTime.Now.ToLongTimeString() + "} [CLIENT->SERVER" + (Suppressed ? " SUPPRESSED" : "") + "]: " +
                     ((LibMinecraft.Model.PacketID)PacketID).ToString() + " (0x" + PacketID.ToString("x") + ")");
             else
-                sw.WriteLine("{" + DateTime.Now.ToLongTimeString() + "} [SERVER->CLIENT]: " +
+                sw.WriteLine("{" + DateTime.Now.ToLongTimeString() + "} [SERVER->CLIENT" + (Suppressed ? " SUPPRESSED" : "") + "]: " +
                     ((LibMinecraft.Model.PacketID)PacketID).ToString() + " (0x" + PacketID.ToString("x") + ")");
             sw.WriteLine("\t[" + DumpArray(pr.Payload) + "]");
             for (int i = 0; i < args.Length; i += 2)
@@ -990,6 +1025,8 @@ namespace SMProxy
 
         static void LogPacket(StreamWriter sw, bool ClientToServer, byte PacketID, string name, PacketReader pr, params object[] args)
         {
+            bool Suppressed = (ClientToServer && ClientDenyPackets.Contains(PacketID)) ||
+                              (!ClientToServer && ServerDenyPackets.Contains(PacketID));
             if (FilterOutput && !Filter.Contains(PacketID))
                 return;
             if (ClientToServer && SuppressClient)
@@ -997,10 +1034,10 @@ namespace SMProxy
             if (!ClientToServer && SuppressServer)
                 return;
             if (ClientToServer)
-                sw.WriteLine("{" + DateTime.Now.ToLongTimeString() + "} [CUSTOM CLIENT->SERVER]: " +
+                sw.WriteLine("{" + DateTime.Now.ToLongTimeString() + "} [CUSTOM CLIENT->SERVER" + (Suppressed ? " SUPPRESSED" : "") + "]: " +
                     name + " (0x" + PacketID.ToString("x") + ")");
             else
-                sw.WriteLine("{" + DateTime.Now.ToLongTimeString() + "} [CUSTOM SERVER->CLIENT]: " +
+                sw.WriteLine("{" + DateTime.Now.ToLongTimeString() + "} [CUSTOM SERVER->CLIENT" + (Suppressed ? " SUPPRESSED" : "") + "]: " +
                     name + " (0x" + PacketID.ToString("x") + ")");
             sw.WriteLine("\t[" + DumpArray(pr.Payload) + "]");
             for (int i = 0; i < args.Length; i += 2)
@@ -1016,6 +1053,8 @@ namespace SMProxy
         static void LogProfiling(StreamWriter sw, DateTime downloadStartTime, DateTime downloadCompleteTime,
             DateTime uploadStartTime, bool ClientToServer, byte Packet, PacketReader pr)
         {
+            if (!EnableProfiling)
+                return;
             if (ClientToServer && SuppressClient)
                 return;
             if (!ClientToServer && SuppressServer)
