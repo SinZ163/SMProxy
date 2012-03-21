@@ -44,7 +44,11 @@ namespace SMProxy
                 "\tExample for the pre-existing entity equipment packet:\n" +
                 "\t-ap EntityEquipment:S:05:int,short,short,short\n" +
                 "\tDo not use spaces in the packet name.\n" +
-                "\tValid data types:\n\tboolean, byte, short, int, long, float, double, string, and slot.\n\n" +
+                "\tValid data types:\n\tboolean, byte, short, int, long, float, double, string, mob, slot,\n\tarray[count]\n" +
+                "\tYou may also specify names for each item.  Example: long(name).  You\n" +
+                "\tcan also use this name as a parameter to an array.  For instance,\n" +
+                "\t\"int(example),array[example]\".  You may do basic math in this\n" +
+                "\tstatement: array[example*4].  Do not use spaces.\n" +
                 "\tCustom packets added with this flag will override the existing packet.\n" +
                 "-sp [packet]:[direction],...: Suppresses a packet.  [packet] is a packet ID,\n" +
                 "\tand [direction] is any combination of 'C' and 'S', for which endpoint\n" + 
@@ -224,42 +228,53 @@ namespace SMProxy
                             if (CustomClientPackets.ContainsKey((byte)data))
                             {
                                 string[] customPacket = CustomClientPackets[(byte)data].Split(':');
-                                object[] dump = new object[0];
+                                List<object> packetData = new List<object>();
                                 foreach (string item in customPacket[1].Split(','))
                                 {
-                                    dump = dump.Concat(new string[] { item }).ToArray();
-                                    switch (item)
+                                    string type = item;
+                                    string name = item;
+                                    if (item.Contains("(") && item.EndsWith(")"))
+                                    {
+                                        type = item.Remove(item.IndexOf("("));
+                                        name = item.Substring(name.IndexOf("(") + 1);
+                                        name = name.Remove(name.Length - 1);
+                                    }
+                                    packetData.Add(name);
+                                    switch (type)
                                     {
                                         case "boolean":
-                                            dump = dump.Concat(new object[] { pr.ReadBoolean() }).ToArray();
+                                            packetData.Add(pr.ReadBoolean());
                                             break;
                                         case "byte":
-                                            dump = dump.Concat(new object[] { pr.ReadByte() }).ToArray();
+                                            packetData.Add(pr.ReadByte());
                                             break;
                                         case "short":
-                                            dump = dump.Concat(new object[] { pr.ReadShort() }).ToArray();
+                                            packetData.Add(pr.ReadShort());
                                             break;
                                         case "int":
-                                            dump = dump.Concat(new object[] { pr.ReadInt() }).ToArray();
+                                            packetData.Add(pr.ReadInt());
                                             break;
                                         case "long":
-                                            dump = dump.Concat(new object[] { pr.ReadLong() }).ToArray();
+                                            packetData.Add(pr.ReadLong());
                                             break;
                                         case "float":
-                                            dump = dump.Concat(new object[] { pr.ReadFloat() }).ToArray();
+                                            packetData.Add(pr.ReadFloat());
                                             break;
                                         case "double":
-                                            dump = dump.Concat(new object[] { pr.ReadDouble() }).ToArray();
+                                            packetData.Add(pr.ReadDouble());
                                             break;
                                         case "slot":
-                                            dump = dump.Concat(new object[] { pr.ReadSlot() }).ToArray();
+                                            packetData.Add(pr.ReadSlot());
+                                            break;
+                                        case "mob":
+                                            packetData.Add(pr.ReadMobMetadata());
                                             break;
                                         case "string":
-                                            dump = dump.Concat(new object[] { pr.ReadString() }).ToArray();
+                                            packetData.Add(pr.ReadString());
                                             break;
                                     }
                                 }
-                                LogPacket(outputLogger, true, (byte)data, customPacket[0], pr, dump);
+                                LogPacket(outputLogger, true, (byte)data, customPacket[0], pr, packetData.ToArray());
                             }
                             else
                             {
@@ -470,42 +485,53 @@ namespace SMProxy
                             if (CustomServerPackets.ContainsKey((byte)data))
                             {
                                 string[] customPacket = CustomServerPackets[(byte)data].Split(':');
-                                object[] dump = new object[0];
+                                List<object> packetData = new List<object>();
                                 foreach (string item in customPacket[1].Split(','))
                                 {
-                                    dump = dump.Concat(new string[] { item }).ToArray();
-                                    switch (item)
+                                    string type = item;
+                                    string name = item;
+                                    if (item.Contains("(") && item.EndsWith(")"))
+                                    {
+                                        type = item.Remove(item.IndexOf("("));
+                                        name = item.Substring(name.IndexOf("(") + 1);
+                                        name = name.Remove(name.Length - 1);
+                                    }
+                                    packetData.Add(name);
+                                    switch (type)
                                     {
                                         case "boolean":
-                                            dump = dump.Concat(new object[] { pr.ReadBoolean() }).ToArray();
+                                            packetData.Add(pr.ReadBoolean());
                                             break;
                                         case "byte":
-                                            dump = dump.Concat(new object[] { pr.ReadByte() }).ToArray();
+                                            packetData.Add(pr.ReadByte());
                                             break;
                                         case "short":
-                                            dump = dump.Concat(new object[] { pr.ReadShort() }).ToArray();
+                                            packetData.Add(pr.ReadShort());
                                             break;
                                         case "int":
-                                            dump = dump.Concat(new object[] { pr.ReadInt() }).ToArray();
+                                            packetData.Add(pr.ReadInt());
                                             break;
                                         case "long":
-                                            dump = dump.Concat(new object[] { pr.ReadLong() }).ToArray();
+                                            packetData.Add(pr.ReadLong());
                                             break;
                                         case "float":
-                                            dump = dump.Concat(new object[] { pr.ReadFloat() }).ToArray();
+                                            packetData.Add(pr.ReadFloat());
                                             break;
                                         case "double":
-                                            dump = dump.Concat(new object[] { pr.ReadDouble() }).ToArray();
+                                            packetData.Add(pr.ReadDouble());
                                             break;
                                         case "slot":
-                                            dump = dump.Concat(new object[] { pr.ReadSlot() }).ToArray();
+                                            packetData.Add(pr.ReadSlot());
+                                            break;
+                                        case "mob":
+                                            packetData.Add(pr.ReadMobMetadata());
                                             break;
                                         case "string":
-                                            dump = dump.Concat(new object[] { pr.ReadString() }).ToArray();
+                                            packetData.Add(pr.ReadString());
                                             break;
                                     }
                                 }
-                                LogPacket(outputLogger, false, (byte)data, customPacket[0], pr, dump);
+                                LogPacket(outputLogger, false, (byte)data, customPacket[0], pr, packetData.ToArray());
                             }
                             else
                             {
