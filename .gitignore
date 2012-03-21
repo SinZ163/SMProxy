@@ -1,2 +1,4 @@
 /SMProxy/bin/
 /SMProxy/obj/
+*.user
+*.suo

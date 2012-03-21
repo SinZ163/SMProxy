@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using LibMinecraft.Model;
+using NCalc;
 
 namespace SMProxy
 {
@@ -231,13 +232,22 @@ namespace SMProxy
                                 List<object> packetData = new List<object>();
                                 foreach (string item in customPacket[1].Split(','))
                                 {
-                                    string type = item;
-                                    string name = item;
-                                    if (item.Contains("(") && item.EndsWith(")"))
+                                    string parameter = new string(item.ToCharArray());
+                                    string type = parameter;
+                                    string name = parameter;
+                                    string expression = parameter;
+                                    if (parameter.Contains("[") && parameter.Contains("]"))
                                     {
-                                        type = item.Remove(item.IndexOf("("));
-                                        name = item.Substring(name.IndexOf("(") + 1);
-                                        name = name.Remove(name.Length - 1);
+                                        expression = parameter.Substring(item.IndexOf("[") + 1);
+                                        expression = expression.Remove(expression.IndexOf("]"));
+                                        parameter = parameter.Remove(parameter.IndexOf("["), parameter.IndexOf("]") - parameter.IndexOf("[") + 1);
+                                        type = parameter;
+                                    }
+                                    if (parameter.Contains("(") && parameter.Contains(")"))
+                                    {
+                                        type = parameter.Remove(parameter.IndexOf("("));
+                                        name = parameter.Substring(name.IndexOf("(") + 1);
+                                        name = name.Remove(name.IndexOf(")"));
                                     }
                                     packetData.Add(name);
                                     switch (type)
@@ -271,6 +281,25 @@ namespace SMProxy
                                             break;
                                         case "string":
                                             packetData.Add(pr.ReadString());
+                                            break;
+                                        case "array":
+                                            Dictionary<string, object> evalParams = new Dictionary<string, object>();
+                                            for (int i = 0; i < packetData.Count - 1; i += 2)
+                                            {
+                                                if (packetData[i + 1] is byte ||
+                                                    packetData[i + 1] is short ||
+                                                    packetData[i + 1] is int ||
+                                                    packetData[i + 1] is long &&
+                                                    !evalParams.ContainsKey(packetData[i].ToString()))
+                                                {
+                                                    evalParams.Add(packetData[i].ToString(), packetData[i + 1]);
+                                                    expression = expression.Replace(packetData[i].ToString(), "[" + packetData[i].ToString() + "]");
+                                                }
+                                            }
+                                            Expression exp = new Expression(expression);
+                                            exp.Parameters = evalParams;
+                                            var result = exp.Evaluate();
+                                            packetData.Add(pr.ReadBytes((int)(double.Parse(result.ToString())))); // Please excuse this, CIL can be ridiculous sometimes
                                             break;
                                     }
                                 }
@@ -488,13 +517,22 @@ namespace SMProxy
                                 List<object> packetData = new List<object>();
                                 foreach (string item in customPacket[1].Split(','))
                                 {
-                                    string type = item;
-                                    string name = item;
-                                    if (item.Contains("(") && item.EndsWith(")"))
+                                    string parameter = new string(item.ToCharArray());
+                                    string type = parameter;
+                                    string name = parameter;
+                                    string expression = parameter;
+                                    if (parameter.Contains("[") && parameter.Contains("]"))
                                     {
-                                        type = item.Remove(item.IndexOf("("));
-                                        name = item.Substring(name.IndexOf("(") + 1);
-                                        name = name.Remove(name.Length - 1);
+                                        expression = parameter.Substring(item.IndexOf("[") + 1);
+                                        expression = expression.Remove(expression.IndexOf("]"));
+                                        parameter = parameter.Remove(parameter.IndexOf("["), parameter.IndexOf("]") - parameter.IndexOf("[") + 1);
+                                        type = parameter;
+                                    }
+                                    if (parameter.Contains("(") && parameter.Contains(")"))
+                                    {
+                                        type = parameter.Remove(parameter.IndexOf("("));
+                                        name = parameter.Substring(name.IndexOf("(") + 1);
+                                        name = name.Remove(name.IndexOf(")"));
                                     }
                                     packetData.Add(name);
                                     switch (type)
@@ -528,6 +566,25 @@ namespace SMProxy
                                             break;
                                         case "string":
                                             packetData.Add(pr.ReadString());
+                                            break;
+                                        case "array":
+                                            Dictionary<string, object> evalParams = new Dictionary<string, object>();
+                                            for (int i = 0; i < packetData.Count - 1; i += 2)
+                                            {
+                                                if ((packetData[i + 1] is byte ||
+                                                    packetData[i + 1] is short ||
+                                                    packetData[i + 1] is int ||
+                                                    packetData[i + 1] is long) &&
+                                                    !evalParams.ContainsKey(packetData[i].ToString()))
+                                                {
+                                                    evalParams.Add(packetData[i].ToString(), packetData[i + 1]);
+                                                    expression = expression.Replace(packetData[i].ToString(), "[" + packetData[i].ToString() + "]");
+                                                }
+                                            }
+                                            Expression exp = new Expression(expression);
+                                            exp.Parameters = evalParams;
+                                            var result = exp.Evaluate();
+                                            packetData.Add(pr.ReadBytes((int)(double.Parse(result.ToString())))); // Please excuse this, CIL can be ridiculous sometimes
                                             break;
                                     }
                                 }
