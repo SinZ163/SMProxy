@@ -5,8 +5,12 @@ SMProxy is a tool for debugging protocol communication with a Minecraft server, 
 
 SMProxy runs on Windows with Microsoft.NET and Mono, and on Linux/Mac with Mono.
 
-
 Make sure that you use mono-complete on Linux/Mac.  For Linux with Aptitude, use "apt-get install mono-complete".  Use "yum install mono-complete" for Yum.
+
+Compatability
+-----------
+
+If you are interested in using SMProxy for versions other than 1.2.3, check the /compatability directory for premade packet definitions for older versions of the protocol.
 
 Usage
 -----------
@@ -19,11 +23,6 @@ The most basic usage of SMProxy is this:
 SMProxy.exe [server address]
 
 This will listen for connections on 127.0.0.1:25564 and log all communication to "output.txt" in the current directory.  When you connect a Minecraft client to that address, it will feed all communication through to [server address], and create a log of that communication in output.txt.  If at any time the client or server attempts to send data that is inconsistent with the 1.2.3 protocol, the proxy will degrade itself to a generic TCP proxy and output raw communication data.
-
-Compatability
------------
-
-If you are interested in using SMProxy for versions other than 1.2.3, check the /compatability directory for premade packet definitions for older versions of the protocol.
 
 Flags
 -----------
@@ -72,9 +71,17 @@ Example usage: "-sp 03:C" will prevent the client from recieving chat message pa
 
 This flag may be used to add an additional packet to the internal protocol implementation.  This can be useful for testing custom packets, or new versions of the protocol.  Custom packets will also override the existing implementation of the specified packet, if an implementation exists.  [name] is the name of the packet, as it should appear in the log.  Do not use spaces.  [id] is the packet ID, in hexadecimal.  [direction] represents which direction of communication is valid for this packet, a combination of the characters 'C' and 'S', representing which endpoint may send this packet.  [structure] is a comma-delimited list of data types found in this packet.
 
-Valid data types are byte, short, int, long, float, double, string, mob, slot, and array.  They represent, in order, how the packet is to be read.
+Valid data types are *byte, short, int, long, float, double, string, mob, slot*, and *array*.  They represent, in order, how the packet is to be read.
 
-Example usage: "-ap ChatMessage:03:CS:string" would re-define the 1.2.3 chat message packet.  "-ap EntityEquipment:05:S:int,short,short,short" would re-define the 1.2.3 entity equipment packet.
+Example usage:
+
+    -ap ChatMessage:03:CS:string
+	
+This would re-define the 1.2.3 chat message packet.
+
+    -ap EntityEquipment:05:S:int,short,short,short
+
+This would re-define the 1.2.3 entity equipment packet.
 
 You may also use named values and arrays.  Here's an example of how you could implement the Map Chunks packet from the 1.2.3 protocol, using named values and dynamic arrays:
 
