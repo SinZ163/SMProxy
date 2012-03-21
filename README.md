@@ -1,9 +1,14 @@
+SMProxy
+======
+
 SMProxy is a tool for debugging protocol communication with a Minecraft server, currently supporting Minecraft 1.2.3.
 SMProxy runs on Windows with Microsoft.NET and Mono, and on Linux/Mac with Mono.
 Make sure that you use mono-complete on Linux/Mac.  For Linux with Aptitude, use "apt-get install mono-complete".
 Use "yum install mono-complete" for Yum.
 
-Usage:
+Usage
+-----------
+
 Note: For Linux and Mac, you need to preface this with "mono".  Think of it like Java, but for CIL.
 
 SMProxy.exe [flags] [server address]
@@ -16,6 +21,9 @@ directory.  When you connect a Minecraft client to that address, it will feed al
 [server address], and create a log of that communication in output.txt.  If at any time the client or server
 attempts to send data that is inconsistent with the 1.2.3 protocol, the proxy will degrade itself to a generic
 TCP proxy and output raw communication data.
+
+Flags
+-----------
 
 Flags may be used to customize the operation of SMProxy.  The following flags are available:
 
