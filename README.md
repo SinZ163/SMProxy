@@ -125,4 +125,4 @@ This is followed by a series of entries.  Each of these items maps to how SMProx
     
 First, you have the friendly name.  This is followed by the value type in parenthesis, and finally the value of the entry.
 
-If SMProxy is unable to interpret the protocol properly (perhaps caused by a difference in protocol versions), it will revert to a generic TCP proxy and log each byte transferred in hexadecimal.  It will only do this on a per-endpoint basis - if the client sends invalid protocol, but the server does not, the server logs will continue to be accurate.
+If SMProxy is unable to interpret the protocol properly (perhaps caused by a difference in protocol versions), it will revert to a generic TCP proxy and log each byte transferred in hexadecimal.  It will only do this on a per-endpoint basis - if the client sends invalid protocol, but the server does not, the server logs will continue to be detailed.
