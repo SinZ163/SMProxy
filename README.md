@@ -41,8 +41,6 @@ Removes SERVER->CLIENT communication from the log.
 
 Will ouput information about timing to the log.
 
-Example output: "Profiling: Size: 2246; down: 8.0005 ms (280732.454221611 bytes/sec); up: 7.0004 ms (320838.809210902 bytes/sec); Proxy lag: 23.0014 ms"
-
 **Output: -o [file]**
 
 Outputs a communication log to [file].  Default: "output.txt"
@@ -63,7 +61,7 @@ The opposite of -f, packets listed here will be ommitted from the output.
 
 **Suppress packet: -sp [packet]:[direction],...**
 
-Unlike -sc and -ss, this will suppress an individual packet from being reported to either the client or server, or both.  -ss and -sc affect the log only, where -sp will affect actually communication.  [packet] is a packet ID, in hexadecimal.  [direction] is a combination of the characters 'C' and 'S', representing which endpoint will be denied these packets.  This flag accepts a comma delimited list of these entries.
+Unlike -sc and -ss, this will suppress an individual packet from being reported to either the client or server, or both.  -ss and -sc affect the log only, where -sp will affect actual communication.  [packet] is a packet ID, in hexadecimal.  [direction] is a combination of the characters 'C' and 'S', representing which endpoint will be denied these packets.  This flag accepts a comma delimited list of these entries.
 
 Example usage: "-sp 03:C" will prevent the client from recieving chat message packets.  "-sp 12:CS,65:S" will prevent any transmission of animation packets, as well as prevent the server from recieving any window close packets from the client.
 
@@ -92,3 +90,39 @@ You are allowed to reference any value (by name) that you had previously referen
 **Add packet file: -ap [file]**
 
 This form of -ap will load a packet definition file from the disk.  It consists of a series of packet definitions on their own lines, with "#"-prefaced comments and leading and trailing whitespace allowed.
+
+Packet Logs
+-----------
+
+An example packet entry could look like this:
+
+    {6:23:31 PM} [SERVER->CLIENT]: LoginRequest (0x1)
+        [00:00:00:00:00:00:00:04:00:66:00:6c:00:61:00:74:00:00:00:01:00:00:00:00:01:00:14]
+        Protocol Version (Int32): 0
+        [unused] (String): 
+        Level Type (String): flat
+        Server Mode (Int32): 1
+        Dimension (Int32): 0
+        Difficulty (Byte): 1
+        World Height (Byte): 0
+        Max Players (Byte): 20
+        
+There's a lot of information available here.  The first line is this:
+
+    {6:23:31 PM} [SERVER->CLIENT]: LoginRequest (0x1)
+
+Between the { } brackets is the time that this packet was logged.  The [ ] brackets show the direction of communication.  Next is the friendly name of the packet, followed by it's hexadecimal ID in parenthesis.
+
+When a custom packet is used (via -ap), the value in the brackets will specify that it is a custom packet (example: "[CUSTOM SERVER->CLIENT]").  The same holds true for packets suppressed via -sp.
+
+    [00:00:00:00:00:00:00:04:00:66:00:6c:00:61:00:74:00:00:00:01:00:00:00:00:01:00:14]
+    
+Next is a dump of the raw packet contents, in hexadecimal.
+
+This is followed by a series of entries.  Each of these items maps to how SMProxy interprets each packet's contents.
+
+    Protocol Version (Int32): 0
+    
+First, you have the friendly name.  This is followed by the value type in parenthesis, and finally the value of the entry.
+
+If SMProxy is unable to interpret the protocol properly (perhaps caused by a difference in protocol versions), it will revert to a generic TCP proxy and log each byte transferred in hexadecimal.  It will only do this on a per-endpoint basis - if the client sends invalid protocol, but the server does not, the server logs will continue to be accurate.
