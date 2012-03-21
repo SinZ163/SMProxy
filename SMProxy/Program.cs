@@ -51,6 +51,8 @@ namespace SMProxy
                 "\t\"int(example),array[example]\".  You may do basic math in this\n" +
                 "\tstatement: array[example*4].  Do not use spaces.\n" +
                 "\tCustom packets added with this flag will override the existing packet.\n" +
+                "-ap [file]: Adds a list of packets from a file.  The file should have a packet\n" +
+                "\t(see above) on each line.\n" +
                 "-sp [packet]:[direction],...: Suppresses a packet.  [packet] is a packet ID,\n" +
                 "\tand [direction] is any combination of 'C' and 'S', for which endpoint\n" + 
                 "\tto deny the packets to.");
@@ -104,12 +106,38 @@ namespace SMProxy
                         break;
                     case "-ap":
                         string[] parts = args[i + 1].Split(':');
-                        byte id = byte.Parse(parts[1], System.Globalization.NumberStyles.HexNumber);
-                        string direction = parts[2];
-                        if (direction.ToUpper().Contains("C"))
-                            CustomClientPackets.Add(id, parts[0] + ":" + parts[3]);
-                        if (direction.ToUpper().Contains("S"))
-                            CustomServerPackets.Add(id, parts[0] + ":" + parts[3]);
+                        if (parts.Length == 1)
+                        {
+                            StreamReader sr = new StreamReader(args[i + 1]);
+                            string file = sr.ReadToEnd();
+                            sr.Close();
+
+                            file = file.Replace("\r", "");
+                            string[] lines = file.Split('\n');
+                            foreach (string line in lines)
+                            {
+                                if (string.IsNullOrEmpty(line.Trim()))
+                                    continue;
+                                if (line.Trim().StartsWith("#"))
+                                    continue;
+                                parts = line.Trim().Split(':');
+                                byte id = byte.Parse(parts[1], System.Globalization.NumberStyles.HexNumber);
+                                string direction = parts[2];
+                                if (direction.ToUpper().Contains("C"))
+                                    CustomClientPackets.Add(id, parts[0] + ":" + parts[3]);
+                                if (direction.ToUpper().Contains("S"))
+                                    CustomServerPackets.Add(id, parts[0] + ":" + parts[3]);
+                            }
+                        }
+                        else
+                        {
+                            byte id = byte.Parse(parts[1], System.Globalization.NumberStyles.HexNumber);
+                            string direction = parts[2];
+                            if (direction.ToUpper().Contains("C"))
+                                CustomClientPackets.Add(id, parts[0] + ":" + parts[3]);
+                            if (direction.ToUpper().Contains("S"))
+                                CustomServerPackets.Add(id, parts[0] + ":" + parts[3]);
+                        }
                         i++;
                         break;
                     case "-sp":

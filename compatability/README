@@ -1,0 +1,10 @@
+This directory contains files that can be referenced with the -ap flag to emulate
+a protocol version other than what is implemented in SMProxy.  This can be used so
+that you may use the latest features of SMProxy and still debug older protocol versions.
+
+For example, if you wish to use SMProxy with Minecraft 1.1, use the following syntax:
+
+SMProxy.exe -ap minecraft-1.1.txt [server address]
+
+If you'd like to provide a compatabilty layer for a different protocol version, please
+contact SirCmpwn on FreeNode IRC, or send an email to sir@cmpwn.com.
