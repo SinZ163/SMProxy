@@ -1,0 +1,6 @@
+# Cross version compatability layer for SMProxy
+# Allows Minecraft 1.2.4 clients and 1.2.3 to connect to a 1.2.4 server via the proxy
+
+-sp CA:CS
+-ps
+-pv 29
