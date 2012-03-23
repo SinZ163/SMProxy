@@ -14,7 +14,6 @@ namespace SMProxy
     static partial class Program
     {
         static TcpListener Listener;
-        static bool ClientDirty = false, ServerDirty = false;
         static bool SuppressServer = false, SuppressClient = false, FilterOutput = false,
             IgnoreFilterOutput = false, EnableProfiling = false, SuppressLog = false, PersistentSessions = false;
         static string OutputFile = "output.txt", ServerAddress = null;
@@ -24,7 +23,7 @@ namespace SMProxy
         static List<byte> ServerDenyPackets = new List<byte>();
         static int LocalPort = 25564, RemotePort = 25565;
         static int ProtocolVersion = 29;
-        static string LocalEndpoint = "127.0.0.1";
+        static string LocalEndpoint = "127.0.0.1", RemoteEndpoint = "127.0.0.1";
         static Dictionary<byte, string> CustomClientPackets = new Dictionary<byte, string>();
         static Dictionary<byte, string> CustomServerPackets = new Dictionary<byte, string>();
         static StreamWriter outputLogger = null;
@@ -84,29 +83,29 @@ namespace SMProxy
                     DisplayHelp();
                     return;
                 }
-                switch (args[i])
+                switch (args[i].Trim())
                 {
                     case "-o":
                     case "--output":
-                        OutputFile = args[i + 1];
+                        OutputFile = args[i + 1].Trim();
                         i++;
                         break;
                     case "-p":
                     case "--port":
-                        LocalPort = int.Parse(args[i + 1]);
+                        LocalPort = int.Parse(args[i + 1].Trim());
                         i++;
                         break;
                     case "-f":
                     case "--filter":
                         FilterOutput = true;
-                        foreach (string s in args[i + 1].Split(','))
+                        foreach (string s in args[i + 1].Trim().Split(','))
                             Filter.Add(byte.Parse(s, System.Globalization.NumberStyles.HexNumber));
                         i++;
                         break;
                     case "-!f":
                     case "--!filter":
                         IgnoreFilterOutput = true;
-                        foreach (string s in args[i + 1].Split(','))
+                        foreach (string s in args[i + 1].Trim().Split(','))
                             IgnoreFilter.Add(byte.Parse(s, System.Globalization.NumberStyles.HexNumber));
                         i++;
                         break;
@@ -124,12 +123,12 @@ namespace SMProxy
                         break;
                     case "-pv":
                     case "--protocol-version":
-                        ProtocolVersion = int.Parse(args[i + 1]);
+                        ProtocolVersion = int.Parse(args[i + 1].Trim());
                         i++;
                         break;
                     case "-ap":
                     case "--add-packet":
-                        string[] parts = args[i + 1].Split(':');
+                        string[] parts = args[i + 1].Trim().Split(':');
                         byte id = byte.Parse(parts[1], System.Globalization.NumberStyles.HexNumber);
                         string direction = parts[2];
                         if (direction.ToUpper().Contains("C"))
@@ -140,7 +139,7 @@ namespace SMProxy
                         break;
                     case "-pf":
                     case "--parameter-file":
-                        StreamReader sr = new StreamReader(args[i + 1]);
+                        StreamReader sr = new StreamReader(args[i + 1].Trim());
                         string file = sr.ReadToEnd();
                         sr.Close();
 
@@ -158,7 +157,7 @@ namespace SMProxy
                         break;
                     case "-sp":
                     case "--suppress-packet":
-                        parts = args[i + 1].Split(',');
+                        parts = args[i + 1].Trim().Split(',');
                         foreach (string part in parts)
                         {
                             string[] subParts = part.Split(':');
@@ -175,7 +174,7 @@ namespace SMProxy
                         break;
                     case "-ep":
                     case "--endpoint":
-                        LocalEndpoint = args[i + 1];
+                        LocalEndpoint = args[i + 1].Trim();
                         i++;
                         break;
                     case "-ps":
@@ -183,7 +182,7 @@ namespace SMProxy
                         PersistentSessions = true;
                         break;
                     default:
-                        DisplayHelp();
+                        RemoteEndpoint = args[i];
                         return;
                 }
             }

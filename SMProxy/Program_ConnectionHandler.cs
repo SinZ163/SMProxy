@@ -13,6 +13,8 @@ namespace SMProxy
     {
         private static void HandleConnection(StreamWriter outputLogger, TcpClient client, TcpClient server)
         {
+            bool ClientDirty = false, ServerDirty = false;
+
             Console.WriteLine("Connected to remote server.");
 
             try
