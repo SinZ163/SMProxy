@@ -21,6 +21,7 @@ namespace SMProxy
         static List<byte> ClientDenyPackets = new List<byte>();
         static List<byte> ServerDenyPackets = new List<byte>();
         static int LocalPort = 25564, RemotePort = 25565;
+        static int ProtocolVersion = 29;
         static Dictionary<byte, string> CustomClientPackets = new Dictionary<byte, string>();
         static Dictionary<byte, string> CustomServerPackets = new Dictionary<byte, string>();
 
@@ -55,7 +56,8 @@ namespace SMProxy
                 "\t(see above) on each line.\n" +
                 "-sp [packet]:[direction],...: Suppresses a packet.  [packet] is a packet ID,\n" +
                 "\tand [direction] is any combination of 'C' and 'S', for which endpoint\n" + 
-                "\tto deny the packets to.");
+                "\tto deny the packets to.\n" +
+                "-pv [version]: Manually set the protocol version number, in decimal.  Default: 29");
         }
 
         static void Main(string[] args)
@@ -104,6 +106,10 @@ namespace SMProxy
                     case "-ep":
                         EnableProfiling = true;
                         break;
+                    case "-pv":
+                        ProtocolVersion = int.Parse(args[i + 1]);
+                        i++;
+                        break;
                     case "-ap":
                         string[] parts = args[i + 1].Split(':');
                         if (parts.Length == 1)
@@ -120,13 +126,7 @@ namespace SMProxy
                                     continue;
                                 if (line.Trim().StartsWith("#"))
                                     continue;
-                                parts = line.Trim().Split(':');
-                                byte id = byte.Parse(parts[1], System.Globalization.NumberStyles.HexNumber);
-                                string direction = parts[2];
-                                if (direction.ToUpper().Contains("C"))
-                                    CustomClientPackets.Add(id, parts[0] + ":" + parts[3]);
-                                if (direction.ToUpper().Contains("S"))
-                                    CustomServerPackets.Add(id, parts[0] + ":" + parts[3]);
+                                args = args.Concat(new string[] { line.Trim() }).ToArray();
                             }
                         }
                         else
@@ -344,7 +344,7 @@ namespace SMProxy
                                         break;
                                     case 0x01: // Login Request
                                         LogPacket(outputLogger, true, 0x01, pr,
-                                            "Protocol Version", pr.ReadInt(),
+                                            "Protocol Version", pr.ReadInt(ProtocolVersion),
                                             "Username", pr.ReadString());
                                         pr.ReadString();
                                         pr.Read(11);
@@ -468,6 +468,13 @@ namespace SMProxy
                                             "Text2", pr.ReadString(),
                                             "Text3", pr.ReadString(),
                                             "Text4", pr.ReadString());
+                                        break;
+                                    case 0xCA: // Player Abilities
+                                        LogPacket(outputLogger, true, 0xCA, pr,
+                                            "Invulnerable", pr.ReadBoolean(),
+                                            "Is Flying", pr.ReadBoolean(),
+                                            "Can Fly", pr.ReadBoolean(),
+                                            "Instant Mine", pr.ReadBoolean());
                                         break;
                                     case 0xFA: // Plugin Message
                                         string s = pr.ReadString();
@@ -1051,6 +1058,13 @@ namespace SMProxy
                                             "Online", pr.ReadBoolean(),
                                             "Ping", pr.ReadShort());
                                         break;
+                                    case 0xCA: // Player Abilities
+                                        LogPacket(outputLogger, true, 0xCA, pr,
+                                            "Invulnerable", pr.ReadBoolean(),
+                                            "Is Flying", pr.ReadBoolean(),
+                                            "Can Fly", pr.ReadBoolean(),
+                                            "Instant Mine", pr.ReadBoolean());
+                                        break;
                                     case 0xFA: // Plugin Message
                                         string s = pr.ReadString();
                                         short l = pr.ReadShort();
@@ -1375,6 +1389,21 @@ namespace SMProxy
         public int ReadInt()
         {
             return IPAddress.HostToNetworkOrder((int)Read(4));
+        }
+
+        /// <summary>
+        /// Reads the int from the stream, but ignores the value.
+        /// </summary>
+        /// <param name="s">The s.</param>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public int ReadInt(int value)
+        {
+            byte[] b = new byte[4];
+            s.Read(b, 0, 4);
+            int i = IPAddress.HostToNetworkOrder(BitConverter.ToInt32(b, 0));
+            Payload = Payload.Concat(MakeInt(value)).ToArray();
+            return value;
         }
 
         /// <summary>
