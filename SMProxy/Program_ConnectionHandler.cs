@@ -892,6 +892,7 @@ namespace SMProxy
                             }
                         }
                     }
+                    Thread.Sleep(1);
                 }
             }
             catch 
