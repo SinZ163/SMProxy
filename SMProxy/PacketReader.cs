@@ -45,7 +45,7 @@ namespace SMProxy
         /// <param name="msg">The MSG.</param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public byte[] MakeString(String msg)
+        public static byte[] MakeString(String msg)
         {
             short len = IPAddress.HostToNetworkOrder((short)msg.Length);
             byte[] a = BitConverter.GetBytes(len);
@@ -59,7 +59,7 @@ namespace SMProxy
         /// <param name="i">The i.</param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public byte[] MakeInt(int i)
+        public static byte[] MakeInt(int i)
         {
             return BitConverter.GetBytes(IPAddress.HostToNetworkOrder(i));
         }
@@ -70,7 +70,7 @@ namespace SMProxy
         /// <param name="i">The i.</param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public byte[] MakeAbsoluteInt(double i)
+        public static byte[] MakeAbsoluteInt(double i)
         {
             return BitConverter.GetBytes(IPAddress.HostToNetworkOrder((int)(i * 32.0)));
         }
@@ -81,7 +81,7 @@ namespace SMProxy
         /// <param name="i">The i.</param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public byte[] MakeLong(long i)
+        public static byte[] MakeLong(long i)
         {
             return BitConverter.GetBytes(IPAddress.HostToNetworkOrder(i));
         }
@@ -92,12 +92,12 @@ namespace SMProxy
         /// <param name="i">The i.</param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public byte[] MakeShort(short i)
+        public static byte[] MakeShort(short i)
         {
             return BitConverter.GetBytes(IPAddress.HostToNetworkOrder(i));
         }
 
-        public byte[] MakeUShort(ushort i)
+        public static byte[] MakeUShort(ushort i)
         {
             return MakeShort((short)i);
         }
@@ -108,7 +108,7 @@ namespace SMProxy
         /// <param name="d">The d.</param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public byte[] MakeDouble(double d)
+        public static byte[] MakeDouble(double d)
         {
             byte[] b = BitConverter.GetBytes(d);
             if (BitConverter.IsLittleEndian)
@@ -122,7 +122,7 @@ namespace SMProxy
         /// <param name="f">The f.</param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public byte[] MakeFloat(float f)
+        public static byte[] MakeFloat(float f)
         {
             byte[] b = BitConverter.GetBytes(f);
             if (BitConverter.IsLittleEndian)
@@ -136,7 +136,7 @@ namespace SMProxy
         /// <param name="f">The f.</param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public byte MakePackedByte(float f)
+        public static byte MakePackedByte(float f)
         {
             return (byte)(((Math.Floor(f) % 360) / 360) * 256);
         }
@@ -151,7 +151,7 @@ namespace SMProxy
         /// <param name="b">if set to <c>true</c> [b].</param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public byte[] MakeBoolean(Boolean b)
+        public static byte[] MakeBoolean(Boolean b)
         {
             BooleanArray[0] = (byte)(b ? 1 : 0);
             return BooleanArray;

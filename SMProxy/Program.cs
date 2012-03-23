@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using LibMinecraft.Model;
 using NCalc;
 
@@ -275,11 +276,24 @@ namespace SMProxy
         static void AcceptAsync(IAsyncResult Result)
         {
             TcpClient client = Listener.EndAcceptTcpClient(Result);
-            TcpClient server = new TcpClient(ServerAddress, RemotePort);
-
-            HandleConnection(outputLogger, client, server);
-
             Listener.BeginAcceptTcpClient(AcceptAsync, null);
+            try
+            {
+                TcpClient server = new TcpClient(ServerAddress, RemotePort);
+
+                HandleConnection(outputLogger, client, server);
+            }
+            catch
+            {
+                Console.WriteLine("Error connecting to server.");
+                try
+                {
+                    byte[] errorMessage = new byte[] { 0xFF };
+                    errorMessage = errorMessage.Concat(PacketReader.MakeString("[Proxy]: Unable to connect to server")).ToArray();
+                    client.GetStream().Write(errorMessage, 0, errorMessage.Length);
+                }
+                catch { }
+            }
         }
     }
 }
