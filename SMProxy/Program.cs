@@ -126,7 +126,7 @@ namespace SMProxy
                                     continue;
                                 if (line.Trim().StartsWith("#"))
                                     continue;
-                                args = args.Concat(new string[] { line.Trim() }).ToArray();
+                                args = args.Take(args.Length - 1).Concat(line.Split(' ')).Concat(new string[] { args[args.Length - 1] }).ToArray();
                             }
                         }
                         else
