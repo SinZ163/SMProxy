@@ -41,7 +41,7 @@ namespace SMProxy
                 "-sc: Suppress client.  Suppresses logging for client->server packets.\n\tAlternate: --suppress-client\n" +
                 "-ss: Suppress server.  Suppresses logging for server->client packets.\n\tAlternate: --suppress-server\n" +
                 "-pr: Enable profiling.  Logs speed of transmission.\n\tAlternate: --enable-profiling\n" +
-                "-ap [packet]: Adds an additional packet.  This can prevent packet handling\n\tAlternate: --add-packet\n" +
+                "-ap [packet]: Adds an additional packet.  This can prevent packet handling\n" +
                 "\terrors when testing new versions of the Minecraft protocol.\n\n" +
                 "\tPacket Format: [name]:[id (hex)]:[direction]:[values]\n" +
                 "\tDirection is one or both of the characters 'C' and 'S', for each\n" + 
@@ -54,18 +54,18 @@ namespace SMProxy
                 "\tcan also use this name as a parameter to an array.  For instance,\n" +
                 "\t\"int(example),array[example]\".  You may do basic math in this\n" +
                 "\tstatement: array[example*4].  Do not use spaces.\n" +
-                "\tCustom packets added with this flag will override the existing packet.\n" +
-                "-pf [file]: Adds a parameter file, where each line is an argument to pass into\n\tAlternate: --parameter-file\n" +
-                "\tSMProxy, as if done through the command line.\n" +
+                "\tCustom packets added with this flag will override the existing packet.\n\tAlternate: --add-packet\n" +
+                "-pf [file]: Adds a parameter file, where each line is an argument to pass into\n" +
+                "\tSMProxy, as if done through the command line.\n\tAlternate: --parameter-file\n" +
                 "-sp [packet]:[direction],...: Suppresses a packet.  [packet] is a packet ID,\n" +
                 "\tand [direction] is any combination of 'C' and 'S', for which endpoint\n" + 
-                "\tto deny the packets to.\n" +
+                "\tto deny the packets to.\n\tAlternate: --suppress-packet\n" +
                 "-pv [version]: Manually set the protocol version number, in decimal. Default: 29\n\tAlternate: --protocol-version\n" +
                 "-ep [value]: Changes the local endpoint. Default: 127.0.0.1\n\tAlternate: --endpoint\n" +
                 "-sl: Suppress log.  Completely stops logging.\n\tAlternate: --suppress-log\n" +
-                "-ps: Enable persistent sessions.  This will wait for the user to type \"quit\"\n\tAlternate: --persistent-session\n" +
+                "-ps: Enable persistent sessions.  This will wait for the user to type \"quit\"\n" +
                 "\tinto the console before closing.  When disabled, SMProxy will exit\n" +
-                "\tafter a single session is complete.");
+                "\tafter a single session is complete.\n\tAlternate: --persistent-session\n");
         }
 
         static void Main(string[] args)
