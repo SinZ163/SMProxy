@@ -1,7 +1,7 @@
 SMProxy
 ======
 
-SMProxy is a tool for debugging protocol communication with a Minecraft server, currently supporting Minecraft 1.2.3.
+SMProxy is a tool for debugging protocol communication with a Minecraft server, currently supporting Minecraft 1.2.4.
 
 SMProxy runs on Windows with Microsoft.NET and Mono, and on Linux/Mac with Mono.
 
@@ -10,7 +10,7 @@ Make sure that you use mono-complete on Linux/Mac.  For Linux with Aptitude, use
 Compatability
 -----------
 
-If you are interested in using SMProxy for versions other than 1.2.3, check the /compatability directory for premade packet definitions for older versions of the protocol.
+If you are interested in using SMProxy for versions other than 1.2.4, check the /compatability directory for premade packet definitions for older versions of the protocol.
 
 Usage
 -----------
@@ -29,43 +29,43 @@ Flags
 
 Flags may be used to customize the operation of SMProxy.  The following flags are available:
 
-**Suppress client: -sc**
+**Suppress client: -sc** (Alternate: --suppress-client)
 
 Removes CLIENT->SERVER communication from the log.
 
-**Suppress server: -ss**
+**Suppress server: -ss** (Alternate: --suppress-server)
 
 Removes SERVER->CLIENT communication from the log.
 
-**Enable profiling: -ep**
+**Enable profiling: -pr** (Alternate: --enable-profiling)
 
 Will ouput information about timing to the log.
 
-**Output: -o [file]**
+**Output: -o [file]** (Alternate: --ouput)
 
 Outputs a communication log to [file].  Default: "output.txt"
 
-**Port: -p [port]**
+**Port: -p [port]** (Alternate: --port)
 
 Listens on the specified port for incoming traffic.  Default: 25564
 
-**Filter: -f [filter]**
+**Filter: -f [filter]** (Alternate: --filter)
 
 Filters which packets are logged.  This is a comma-delimited list of packets IDs, in hexadecimal.
 
 Example usage: "-f 00,03,04" will filter output to only show keep-alives, chat messages, and time updates.
 
-**!Not Filter: -!f [filter]**
+**!Not Filter: -!f [filter]** (Alternate: --!filter)
 
 The opposite of -f, packets listed here will be ommitted from the output.
 
-**Suppress packet: -sp [packet]:[direction],...**
+**Suppress packet: -sp [packet]:[direction],...** (Alternate: --suppress-packet)
 
 Unlike -sc and -ss, this will suppress an individual packet from being reported to either the client or server, or both.  -ss and -sc affect the log only, where -sp will affect actual communication.  [packet] is a packet ID, in hexadecimal.  [direction] is a combination of the characters 'C' and 'S', representing which endpoint will be denied these packets.  This flag accepts a comma delimited list of these entries.
 
 Example usage: "-sp 03:C" will prevent the client from recieving chat message packets.  "-sp 12:CS,65:S" will prevent any transmission of animation packets, as well as prevent the server from recieving any window close packets from the client.
 
-**Add packet: -ap [name]:[id]:[direction]:[structure]**
+**Add packet: -ap [name]:[id]:[direction]:[structure]** (Alternate: --add-packet)
 
 This flag may be used to add an additional packet to the internal protocol implementation.  This can be useful for testing custom packets, or new versions of the protocol.  Custom packets will also override the existing implementation of the specified packet, if an implementation exists.  [name] is the name of the packet, as it should appear in the log.  Do not use spaces.  [id] is the packet ID, in hexadecimal.  [direction] represents which direction of communication is valid for this packet, a combination of the characters 'C' and 'S', representing which endpoint may send this packet.  [structure] is a comma-delimited list of data types found in this packet.
 
@@ -87,9 +87,25 @@ You may also use named values and arrays.  Here's an example of how you could im
 	
 You are allowed to reference any value (by name) that you had previously referenced.  Do not use spaces in value names or array expressions.  You may also use mathematical expresions in arrays.  For example, "array[(valueByName*3)/5]" would be valid.  The final value will be converted to an integer after the calculation is complete.  You may also use a variety of functions, such as Min and Sqrt.  Another valid example would be "array[Min(value1,value2)]".  A list of these functions is available online.  It includes every function in the .NET class System.Math: http://msdn.microsoft.com/en-us/library/system.math.aspx
 
-**Add packet file: -ap [file]**
+**Parameter File: -pf [file]** (Alternate: --packet-file)
 
-This form of -ap will load a packet definition file from the disk.  It consists of a series of packet definitions on their own lines, with "#"-prefaced comments and leading and trailing whitespace allowed.
+This will load additional parameters from the disk.  It consists of a series of command-line parameters on their own lines, with "#"-prefaced comments and leading and trailing whitespace allowed.
+
+**Protocol Version: -pv [version]** (Alternate: --protocol-version)
+
+Changes the protocol used in packet 0x01.  [version] is in decimal.  The default value is 29.
+
+**Endpoint: -ep [endpoint]** (Alternate: --endpoint)
+
+Changes the local endpoint.  To listen on all interfaces, use "0.0.0.0".  The default value is "127.0.0.1".
+
+**Suppress Log: -sl** (Alternate: --suppress-log)
+
+Completely stops any log files from being produced.
+
+**Persistent Sessions: -ps** (Alternate: --persistent-session)
+
+Changes to persistent session mode.  The default behavior is to handle one session, then exit.  Enabling this will continue to idle and accept connections over time, until "quit" is typed into the console.  This will also allow multiple clients to connect simulataneously.
 
 Packet Logs
 -----------

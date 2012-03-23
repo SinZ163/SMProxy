@@ -1,4 +1,4 @@
-﻿# Packet definitions for Minecraft 1.1 with SMProxy
+﻿# Compatability layer for Minecraft 1.1 with SMProxy
 
 -ap LoginRequest:01:C:int(ProtocolVersion),string(Username),long,string,int,byte,byte,byte,byte
 -ap LoginRequest:01:S:int(ProtocolVersion),string,long(MapSeed),string(LevelType),int(ServerMode),byte(Dimension),byte(Difficulty),byte(WorldHeight),byte(MaxPlayers)
