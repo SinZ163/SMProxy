@@ -166,7 +166,7 @@ namespace LibMinecraft.Model
                     (283 <= value && value <= 286) ||
                     (290 <= value && value <= 294) ||
                     (298 <= value && value <= 317) ||
-                    value == 261 ||
+                    value == 261 || value == 383 ||
                     value == 346;
         }
     }
