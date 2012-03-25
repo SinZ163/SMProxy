@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using LibMinecraft.Model;
+using LuaInterface;
 using NCalc;
 
 namespace SMProxy
@@ -26,6 +27,8 @@ namespace SMProxy
         static string LocalEndpoint = "127.0.0.1", RemoteEndpoint = "127.0.0.1";
         static Dictionary<byte, string> CustomClientPackets = new Dictionary<byte, string>();
         static Dictionary<byte, string> CustomServerPackets = new Dictionary<byte, string>();
+        static Dictionary<byte, string> CustomClientScripts = new Dictionary<byte, string>();
+        static Dictionary<byte, string> CustomServerScripts = new Dictionary<byte, string>();
         static StreamWriter outputLogger = null;
 
         static void DisplayHelp()
@@ -65,7 +68,10 @@ namespace SMProxy
                 "-sl: Suppress log.  Completely stops logging.\n\tAlternate: --suppress-log\n" +
                 "-ps: Enable persistent sessions.  This will wait for the user to type \"quit\"\n" +
                 "\tinto the console before closing.  When disabled, SMProxy will exit\n" +
-                "\tafter a single session is complete.\n\tAlternate: --persistent-session\n");
+                "\tafter a single session is complete.\n\tAlternate: --persistent-session\n" +
+                "-is [packet name]:[packet]:[direction]:[file]: Import a Lua script for a packet.\n" +
+                "\tSee http://tinyurl.com/smproxy-lua for details.\n" +
+                "\tAlternate: --import-script");
         }
 
         static void Main(string[] args)
@@ -180,6 +186,17 @@ namespace SMProxy
                     case "-ps":
                     case "--persistent-session":
                         PersistentSessions = true;
+                        break;
+                    case "-is":
+                    case "--import-script":
+                        parts = args[i + 1].Trim().Split(':');
+                        id = byte.Parse(parts[1], System.Globalization.NumberStyles.HexNumber);
+                        direction = parts[2];
+                        if (direction.ToUpper().Contains("C"))
+                            CustomClientScripts.Add(id, parts[0] + ":" + parts[3]);
+                        if (direction.ToUpper().Contains("S"))
+                            CustomServerScripts.Add(id, parts[0] + ":" + parts[3]);
+                        i++;
                         break;
                     default:
                         RemoteEndpoint = args[i];

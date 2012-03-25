@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using LuaInterface;
 using NCalc;
 
 namespace SMProxy
@@ -14,7 +15,6 @@ namespace SMProxy
         private static void HandleConnection(StreamWriter outputLogger, TcpClient client, TcpClient server)
         {
             bool ClientDirty = false, ServerDirty = false;
-
             Console.WriteLine("Connected to remote server.");
 
             try
@@ -24,8 +24,8 @@ namespace SMProxy
                     if (client.Available != 0)
                     {
                         DateTime downloadStartTime = DateTime.Now;
-
                         PacketReader pr = new PacketReader(client);
+                        Lua lua = ConfigureLua(pr, outputLogger);
 
                         byte data = pr.ReadByte();
 
@@ -33,17 +33,27 @@ namespace SMProxy
                         {
                             try
                             {
-                                server.GetStream().WriteByte((byte)data);
+                                server.GetStream().WriteByte(data);
                                 outputLogger.WriteLine("{" + DateTime.Now.ToLongTimeString() + "} [RAW CLIENT->SERVER]: " + ((byte)data).ToString("x"));
                             }
                             catch { }
                         }
                         else
                         {
-                            bool suppressed = ServerDenyPackets.Contains((byte)data);
+                            bool suppressed = ServerDenyPackets.Contains(data);
                             try
                             {
-                                if (CustomClientPackets.ContainsKey((byte)data))
+                                if (CustomClientScripts.ContainsKey(data))
+                                {
+                                    string[] customPacket = CustomClientScripts[data].Split(':');
+                                    StreamReader reader = new StreamReader(customPacket[1]);
+                                    string script = reader.ReadToEnd();
+                                    reader.Close();
+                                    lua.DoString(script);
+
+                                    LogPacket(outputLogger, true, data, customPacket[0], pr);
+                                }
+                                else if (CustomClientPackets.ContainsKey(data))
                                 {
                                     string[] customPacket = CustomClientPackets[(byte)data].Split(':');
                                     List<object> packetData = new List<object>();
