@@ -291,9 +291,11 @@ namespace SMProxy
                                     }
                                 }
                             }
-                            catch
+                            catch (Exception e)
                             {
                                 ClientDirty = true;
+                                Console.WriteLine("Exception occured:");
+                                Console.WriteLine(e.ToString());
                                 Console.WriteLine("WARNING: Client sent unrecognized packet (0x" + data.ToString("x") + ")!  Switching to raw log mode.");
                                 outputLogger.WriteLine("WARNING: Client sent unrecognized packet (0x" + data.ToString("x") + ")!  Switching to raw log mode.");
                             }
@@ -876,9 +878,11 @@ namespace SMProxy
                                     }
                                 }
                             }
-                            catch
+                            catch (Exception e)
                             {
                                 ServerDirty = true;
+                                Console.WriteLine("Exception occured:");
+                                Console.WriteLine(e.ToString());
                                 Console.WriteLine("WARNING: Server sent unrecognized packet (0x" + data.ToString("x") + ")!  Switching to raw log mode.");
                                 outputLogger.WriteLine("WARNING: Server sent unrecognized packet (0x" + data.ToString("x") + ")!  Switching to raw log mode.");
                             }
