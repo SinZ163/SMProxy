@@ -30,17 +30,13 @@ namespace SMProxy
                         PacketReader pr = new PacketReader(client);
 
                         Lua lua = null;
-                        try
-                        {
+                        if (Type.GetType("Mono.Runtime") == null)
                             lua = ConfigureLua(pr, outputLogger);
-                        }
-                        catch
-                        {
+                        else
                             Console.WriteLine("WARNING!  Lua scripts are not currently supported on Mono, and have been disabled.");
-                        }
 
                         byte data = pr.ReadByte();
-                        if (data != 0x01 && server == null)
+                        if (data != 0x02 && server == null)
                             server = new TcpClient(ServerAddress, RemotePort);
 
                         if (ClientDirty)
