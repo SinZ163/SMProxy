@@ -107,6 +107,14 @@ Completely stops any log files from being produced.
 
 Changes to persistent session mode.  The default behavior is to handle one session, then exit.  Enabling this will continue to idle and accept connections over time, until "quit" is typed into the console.  This will also allow multiple clients to connect simulataneously.
 
+**Import Script: -is [packet name]:[packet id]:[direction]:[script file]** (Alternate: --import-script)
+
+Imports a Lua script to be used for the specified packet.  Packet ID is in hexadecimal.  The direction is a combination of the characters 'C' and 'S', representing which side of the protocol may send the packet.  See LUA.md for more information on writing packet scripts.
+
+**Virtual Host: -vh [host]:[destination]** (Alternate: --virtual-host)
+
+Adds a virtual host to SMProxy.  Any connections to SMProxy via [host] will be redirected to [destination].  A default endpoint is still required as the last argument when starting SMProxy.
+
 Packet Logs
 -----------
 
