@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -12,14 +13,16 @@ namespace SMProxy
 {
     static partial class Program
     {
-        private static void HandleConnection(StreamWriter outputLogger, TcpClient client, TcpClient server)
+        private static void HandleConnection(StreamWriter outputLogger, TcpClient client, string ServerAddress, int RemotePort)
         {
+            TcpClient server = null;
+
             bool ClientDirty = false, ServerDirty = false;
             Console.WriteLine("Connected to remote server.");
 
             try
             {
-                while (client.Connected && server.Connected)
+                while (client.Connected && (server == null || server.Connected))
                 {
                     if (client.Available != 0)
                     {
@@ -28,6 +31,8 @@ namespace SMProxy
                         Lua lua = ConfigureLua(pr, outputLogger);
 
                         byte data = pr.ReadByte();
+                        if (data != 0x01 && server == null)
+                            server = new TcpClient(ServerAddress, RemotePort);
 
                         if (ClientDirty)
                         {
@@ -149,8 +154,24 @@ namespace SMProxy
                                             pr.Read(11);
                                             break;
                                         case 0x02: // Handshake
+                                            string usernameAndHost = pr.ReadString();
                                             LogPacket(outputLogger, true, 0x02, pr,
-                                                "Username/Hostname", pr.ReadString());
+                                                "Username/Hostname", usernameAndHost);
+                                            string[] parts = usernameAndHost.Split(';');
+                                            string[] host = parts[1].Split(':');
+                                            int port = 25565;
+                                            if (host.Length != 1)
+                                                port = int.Parse(host[1]);
+                                            if (VirtualHosts.ContainsKey(host[0] + ":" + port.ToString()))
+                                            {
+                                                host = VirtualHosts[host[0] + ":" + port.ToString()].Split(':');
+                                                port = 25565;
+                                                if (host.Length != 1)
+                                                    port = int.Parse(host[1]);
+                                                server = new TcpClient(host[0], port);
+                                            }
+                                            else
+                                                server = new TcpClient(ServerAddress, RemotePort);
                                             break;
                                         case 0x03: // Chat Message
                                             string msg = pr.ReadString();
@@ -321,7 +342,7 @@ namespace SMProxy
                             }
                         }
                     }
-                    if (server.Connected && client.Connected && server.Available != 0)
+                    if (server != null && server.Connected && client.Connected && server.Available != 0)
                     {
                         DateTime downloadStartTime = DateTime.Now;
 
