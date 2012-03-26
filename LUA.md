@@ -5,6 +5,8 @@ You can specify custom packet implementations with Lua as of SMProxy version 1.2
 
 SMProxy exposes a number of functions that a Lua script may use.  They each read from the connected socket and output the resulting value, both returning it to the caller and sending it to the connected socket.
 
+Lua is not currently supported on Mono.
+
 They are:
 
 * readByte()

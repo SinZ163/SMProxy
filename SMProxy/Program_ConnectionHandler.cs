@@ -28,7 +28,16 @@ namespace SMProxy
                     {
                         DateTime downloadStartTime = DateTime.Now;
                         PacketReader pr = new PacketReader(client);
-                        Lua lua = ConfigureLua(pr, outputLogger);
+
+                        Lua lua = null;
+                        try
+                        {
+                            lua = ConfigureLua(pr, outputLogger);
+                        }
+                        catch
+                        {
+                            Console.WriteLine("WARNING!  Lua scripts are not currently supported on Mono, and have been disabled.");
+                        }
 
                         byte data = pr.ReadByte();
                         if (data != 0x01 && server == null)
@@ -50,13 +59,16 @@ namespace SMProxy
                             {
                                 if (CustomClientScripts.ContainsKey(data))
                                 {
-                                    string[] customPacket = CustomClientScripts[data].Split(':');
-                                    StreamReader reader = new StreamReader(customPacket[1]);
-                                    string script = reader.ReadToEnd();
-                                    reader.Close();
-                                    lua.DoString(script);
+                                    if (lua != null)
+                                    {
+                                        string[] customPacket = CustomClientScripts[data].Split(':');
+                                        StreamReader reader = new StreamReader(customPacket[1]);
+                                        string script = reader.ReadToEnd();
+                                        reader.Close();
+                                        lua.DoString(script);
 
-                                    LogPacket(outputLogger, true, data, customPacket[0], pr);
+                                        LogPacket(outputLogger, true, data, customPacket[0], pr);
+                                    }
                                 }
                                 else if (CustomClientPackets.ContainsKey(data))
                                 {
