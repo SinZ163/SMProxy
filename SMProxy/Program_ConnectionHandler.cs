@@ -13,6 +13,8 @@ namespace SMProxy
 {
     static partial class Program
     {
+        static bool LuaError = false;
+
         private static void HandleConnection(StreamWriter outputLogger, TcpClient client, string ServerAddress, int RemotePort)
         {
             TcpClient server = null;
@@ -32,8 +34,11 @@ namespace SMProxy
                         Lua lua = null;
                         if (Type.GetType("Mono.Runtime") == null)
                             lua = ConfigureLua(pr, outputLogger);
-                        else
+                        else if (!LuaError)
+                        {
+                            LuaError = true;
                             Console.WriteLine("WARNING!  Lua scripts are not currently supported on Mono, and have been disabled.");
+                        }
 
                         byte data = pr.ReadByte();
                         if (data != 0x02 && server == null)
