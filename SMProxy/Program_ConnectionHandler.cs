@@ -471,7 +471,7 @@ namespace SMProxy
                                             break;
                                         case 0x01: // Login Request
                                             LogPacket(outputLogger, false, 0x01, pr,
-                                                "Protocol Version", pr.ReadInt(),
+                                                "Entity ID", pr.ReadInt(),
                                                 "[unused]", pr.ReadString(),
                                                 "Level Type", pr.ReadString(),
                                                 "Server Mode", pr.ReadInt(),

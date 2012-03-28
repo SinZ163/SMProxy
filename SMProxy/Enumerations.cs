@@ -89,7 +89,7 @@ namespace LibMinecraft.Model
         /// <summary>
         /// Sent from the client when the player changes the slot selection 
         /// </summary>
-        HoldingChange = 0x10,
+        HeldItemChange = 0x10,
         /// <summary>
         /// Associated with players using beds
         /// </summary>
@@ -108,12 +108,12 @@ namespace LibMinecraft.Model
         /// Spawns a named entity on the client.
         /// </summary>
         /// <remarks>Players are currently the only named entity.</remarks>
-        NamedEntitySpawn = 0x14,
+        SpawnNamedEntity = 0x14,
         /// <summary>
         /// Sent to the client when an item on the ground comes within visual range of the player.
         /// </summary>
         /// <remarks>This packet is not used to pick up items.</remarks>
-        PickupSpawn = 0x15,
+        SpawnDroppedItem = 0x15,
         /// <summary>
         /// Sent from the server when a player picks up an item on the ground.
         /// </summary>
@@ -123,25 +123,20 @@ namespace LibMinecraft.Model
         /// Sent to the client when an Object or Vehicle is made
         /// </summary>
         /// <remarks>Server to client</remarks>
-        AddObjectOrVehicle = 0x17,
+        SpawnObjectOrVehicle = 0x17,
         /// <summary>
         /// Sent to the client when an mob is spawned
         /// </summary>
         /// <remarks>Server to client</remarks>
-        MobSpawn = 0x18,
+        SpawnMob = 0x18,
         /// <summary>
         /// Sent to spawn a painting entity
         /// </summary>
-        EntityPainting = 0x19,
+        SpawnPainting = 0x19,
         /// <summary>
         /// Sent to the client to spawn one or more experience orbs in a specific location
         /// </summary>
-        ExperienceOrb = 0x1A,
-        /// <summary>
-        /// Updates player stance
-        /// </summary>
-        /// <remarks>Unused by the 1.1 client</remarks>
-        StanceUpdate = 0x1B,
+        SpawnExperienceOrb = 0x1A,
         /// <summary>
         /// Updates how fast an object is going
         /// </summary>
@@ -198,16 +193,16 @@ namespace LibMinecraft.Model
         /// <summary>
         /// Sent to the client upon any experience changes
         /// </summary>
-        Experience = 0x2B,
+        SetExperience = 0x2B,
         // ...
         /// <summary>
         /// This packet is used to notify the client either to initialize or unload the following chunk(s)
         /// </summary>
-        PreChunk = 0x32,
+        MapColumnAllocation = 0x32,
         /// <summary>
         /// this is date about the map and the chunks are usually 16^3
         /// </summary>
-        MapChunk = 0x33,
+        MapChunks = 0x33,
         /// <summary>
         /// This is called when multiple blocks have been changed within a region at one time
         /// </summary>
@@ -233,7 +228,7 @@ namespace LibMinecraft.Model
         /// <summary>
         /// This packet is currently sent when either a bed cant be used as a spawn point or when the raining state changes 
         /// </summary>
-        NewOrInvalidState = 0x46,
+        ChangeInvalidState = 0x46,
         /// <summary>
         /// This is sent to the client to identify the whereabouts of a thunderbolt strike
         /// </summary>
@@ -250,7 +245,7 @@ namespace LibMinecraft.Model
         /// <summary>
         /// This is sent when the player has clicked a slot 
         /// </summary>
-        WindowClick = 0x66,
+        ClickWindow = 0x66,
         /// <summary>
         /// Sent when an item in a slot is either added or removed
         /// </summary>
@@ -258,15 +253,15 @@ namespace LibMinecraft.Model
         /// <summary>
         /// Sent when an item in a slot, including crafting and equipped armour, is either added or removed
         /// </summary>
-        WindowItems = 0x68,
+        SetWindowItems = 0x68,
         /// <summary>
         /// Used to increase the progress of the furnace and enchantment table
         /// </summary>
-        UpdateProgressBar = 0x69,
+        UpdateWindowProperty = 0x69,
         /// <summary>
         /// This packet is sent from the client and server to tell whether it was accepted, rejected or whether there was a conflict due to lag.
         /// </summary>
-        Transaction = 0x6A,
+        ConfirmTransaction = 0x6A,
         /// <summary>
         /// This packet will be sent when the player drops an item into their quickbar or picks it up from it in creative mode
         /// </summary>
@@ -284,6 +279,10 @@ namespace LibMinecraft.Model
         /// Sends complex data about maps
         /// </summary>
         ItemData = 0x83,
+        /// <summary>
+        /// Used to update the mob shown in spawners
+        /// </summary>
+        UpdateTileEntity = 0x84,
         // ...
         /// <summary>
         /// Increases the statistic chosend by its ID
