@@ -10,66 +10,74 @@ namespace SMProxy
     {
         static void LogPacket(StreamWriter sw, bool ClientToServer, byte PacketID, PacketReader pr, params object[] args)
         {
-            if (sw == null)
-                return;
-            bool Suppressed = (ClientToServer && ClientDenyPackets.Contains(PacketID)) ||
-                              (!ClientToServer && ServerDenyPackets.Contains(PacketID));
-            if (FilterOutput && !Filter.Contains(PacketID))
-                return;
-            if (IgnoreFilterOutput && IgnoreFilter.Contains(PacketID))
-                return;
-            if (ClientToServer && SuppressClient)
-                return;
-            if (!ClientToServer && SuppressServer)
-                return;
-            if (ClientToServer)
-                sw.WriteLine("{" + DateTime.Now.ToLongTimeString() + "} [CLIENT->SERVER" + (Suppressed ? " SUPPRESSED" : "") + "]: " +
-                    ((LibMinecraft.Model.PacketID)PacketID).ToString() + " (0x" + PacketID.ToString("x") + ")");
-            else
-                sw.WriteLine("{" + DateTime.Now.ToLongTimeString() + "} [SERVER->CLIENT" + (Suppressed ? " SUPPRESSED" : "") + "]: " +
-                    ((LibMinecraft.Model.PacketID)PacketID).ToString() + " (0x" + PacketID.ToString("x") + ")");
-            if (pr.Payload.Length == 0)
-                return;
-            sw.WriteLine("\t[" + DumpArray(pr.Payload) + "]");
-            for (int i = 0; i < args.Length; i += 2)
+            try
             {
-                if (args[i + 1] is byte[])
-                    sw.WriteLine("\t" + args[i].ToString() + " (Byte[]): [" + DumpArray((byte[])args[i + 1]) + "]");
+                if (sw == null)
+                    return;
+                bool Suppressed = (ClientToServer && ClientDenyPackets.Contains(PacketID)) ||
+                                  (!ClientToServer && ServerDenyPackets.Contains(PacketID));
+                if (FilterOutput && !Filter.Contains(PacketID))
+                    return;
+                if (IgnoreFilterOutput && IgnoreFilter.Contains(PacketID))
+                    return;
+                if (ClientToServer && SuppressClient)
+                    return;
+                if (!ClientToServer && SuppressServer)
+                    return;
+                if (ClientToServer)
+                    sw.WriteLine("{" + DateTime.Now.ToLongTimeString() + "} [CLIENT->SERVER" + (Suppressed ? " SUPPRESSED" : "") + "]: " +
+                        ((LibMinecraft.Model.PacketID)PacketID).ToString() + " (0x" + PacketID.ToString("x") + ")");
                 else
-                    sw.WriteLine("\t" + args[i].ToString() + " (" + args[i + 1].GetType().Name + "): " + args[i + 1]);
+                    sw.WriteLine("{" + DateTime.Now.ToLongTimeString() + "} [SERVER->CLIENT" + (Suppressed ? " SUPPRESSED" : "") + "]: " +
+                        ((LibMinecraft.Model.PacketID)PacketID).ToString() + " (0x" + PacketID.ToString("x") + ")");
+                if (pr.Payload.Length == 0)
+                    return;
+                sw.WriteLine("\t[" + DumpArray(pr.Payload) + "]");
+                for (int i = 0; i < args.Length; i += 2)
+                {
+                    if (args[i + 1] is byte[])
+                        sw.WriteLine("\t" + args[i].ToString() + " (Byte[]): [" + DumpArray((byte[])args[i + 1]) + "]");
+                    else
+                        sw.WriteLine("\t" + args[i].ToString() + " (" + args[i + 1].GetType().Name + "): " + args[i + 1]);
+                }
+                sw.Flush();
             }
-            sw.Flush();
+            catch { }
         }
 
         static void LogPacket(StreamWriter sw, bool ClientToServer, byte PacketID, string name, PacketReader pr, params object[] args)
         {
-            if (sw == null)
-                return;
-            bool Suppressed = (ClientToServer && ClientDenyPackets.Contains(PacketID)) ||
-                              (!ClientToServer && ServerDenyPackets.Contains(PacketID));
-            if (FilterOutput && !Filter.Contains(PacketID))
-                return;
-            if (ClientToServer && SuppressClient)
-                return;
-            if (!ClientToServer && SuppressServer)
-                return;
-            if (ClientToServer)
-                sw.WriteLine("{" + DateTime.Now.ToLongTimeString() + "} [CUSTOM CLIENT->SERVER" + (Suppressed ? " SUPPRESSED" : "") + "]: " +
-                    name + " (0x" + PacketID.ToString("x") + ")");
-            else
-                sw.WriteLine("{" + DateTime.Now.ToLongTimeString() + "} [CUSTOM SERVER->CLIENT" + (Suppressed ? " SUPPRESSED" : "") + "]: " +
-                    name + " (0x" + PacketID.ToString("x") + ")");
-            if (pr.Payload.Length == 0)
-                return;
-            sw.WriteLine("\t[" + DumpArray(pr.Payload) + "]");
-            for (int i = 0; i < args.Length; i += 2)
+            try
             {
-                if (args[i + 1] is byte[])
-                    sw.WriteLine("\t" + args[i].ToString() + " (Byte[]): [" + DumpArray((byte[])args[i + 1]) + "]");
+                if (sw == null)
+                    return;
+                bool Suppressed = (ClientToServer && ClientDenyPackets.Contains(PacketID)) ||
+                                  (!ClientToServer && ServerDenyPackets.Contains(PacketID));
+                if (FilterOutput && !Filter.Contains(PacketID))
+                    return;
+                if (ClientToServer && SuppressClient)
+                    return;
+                if (!ClientToServer && SuppressServer)
+                    return;
+                if (ClientToServer)
+                    sw.WriteLine("{" + DateTime.Now.ToLongTimeString() + "} [CUSTOM CLIENT->SERVER" + (Suppressed ? " SUPPRESSED" : "") + "]: " +
+                        name + " (0x" + PacketID.ToString("x") + ")");
                 else
-                    sw.WriteLine("\t" + args[i].ToString() + " (" + args[i + 1].GetType().Name + "): " + args[i + 1]);
+                    sw.WriteLine("{" + DateTime.Now.ToLongTimeString() + "} [CUSTOM SERVER->CLIENT" + (Suppressed ? " SUPPRESSED" : "") + "]: " +
+                        name + " (0x" + PacketID.ToString("x") + ")");
+                if (pr.Payload.Length == 0)
+                    return;
+                sw.WriteLine("\t[" + DumpArray(pr.Payload) + "]");
+                for (int i = 0; i < args.Length; i += 2)
+                {
+                    if (args[i + 1] is byte[])
+                        sw.WriteLine("\t" + args[i].ToString() + " (Byte[]): [" + DumpArray((byte[])args[i + 1]) + "]");
+                    else
+                        sw.WriteLine("\t" + args[i].ToString() + " (" + args[i + 1].GetType().Name + "): " + args[i + 1]);
+                }
+                sw.Flush();
             }
-            sw.Flush();
+            catch { }
         }
 
         static void LogProfiling(StreamWriter sw, DateTime downloadStartTime, DateTime downloadCompleteTime,

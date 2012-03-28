@@ -170,18 +170,23 @@ namespace SMProxy
                                             string usernameAndHost = pr.ReadString();
                                             LogPacket(outputLogger, true, 0x02, pr,
                                                 "Username/Hostname", usernameAndHost);
-                                            string[] parts = usernameAndHost.Split(';');
-                                            string[] host = parts[1].Split(':');
-                                            int port = 25565;
-                                            if (host.Length != 1)
-                                                port = int.Parse(host[1]);
-                                            if (VirtualHosts.ContainsKey(host[0] + ":" + port.ToString()))
+                                            if (usernameAndHost.Contains(";"))
                                             {
-                                                host = VirtualHosts[host[0] + ":" + port.ToString()].Split(':');
-                                                port = 25565;
+                                                string[] parts = usernameAndHost.Split(';');
+                                                string[] host = parts[1].Split(':');
+                                                int port = 25565;
                                                 if (host.Length != 1)
                                                     port = int.Parse(host[1]);
-                                                server = new TcpClient(host[0], port);
+                                                if (VirtualHosts.ContainsKey(host[0] + ":" + port.ToString()))
+                                                {
+                                                    host = VirtualHosts[host[0] + ":" + port.ToString()].Split(':');
+                                                    port = 25565;
+                                                    if (host.Length != 1)
+                                                        port = int.Parse(host[1]);
+                                                    server = new TcpClient(host[0], port);
+                                                }
+                                                else
+                                                    server = new TcpClient(ServerAddress, RemotePort);
                                             }
                                             else
                                                 server = new TcpClient(ServerAddress, RemotePort);
