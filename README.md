@@ -1,5 +1,5 @@
 SMProxy
-======
+=======
 
 SMProxy is a tool for debugging protocol communication with a Minecraft server, currently supporting Minecraft 1.2.4.
 
@@ -8,12 +8,12 @@ SMProxy runs on Windows with Microsoft.NET and Mono, and on Linux/Mac with Mono.
 Make sure that you use mono-complete on Linux/Mac.  For Linux with Aptitude, use "apt-get install mono-complete".  Use "yum install mono-complete" for Yum.
 
 Compatability
------------
+-------------
 
 If you are interested in using SMProxy for versions other than 1.2.4, check the /compatability directory for premade packet definitions for older versions of the protocol.
 
 Usage
------------
+-----
 
 Note: For Linux and Mac, you need to preface this with "mono".  Think of it like Java, but for CIL.
 
@@ -25,7 +25,7 @@ SMProxy.exe [server address]
 This will listen for connections on 127.0.0.1:25564 and log all communication to "output.txt" in the current directory.  When you connect a Minecraft client to that address, it will feed all communication through to [server address], and create a log of that communication in output.txt.  If at any time the client or server attempts to send data that is inconsistent with the 1.2.3 protocol, the proxy will degrade itself to a generic TCP proxy and output raw communication data.
 
 Flags
------------
+-----
 
 Flags may be used to customize the operation of SMProxy.  The following flags are available:
 
@@ -150,3 +150,20 @@ This is followed by a series of entries.  Each of these items maps to how SMProx
 First, you have the friendly name.  This is followed by the value type in parenthesis, and finally the value of the entry.
 
 If SMProxy is unable to interpret the protocol properly (perhaps caused by a difference in protocol versions), it will revert to a generic TCP proxy and log each byte transferred in hexadecimal.  It will only do this on a per-endpoint basis - if the client sends invalid protocol, but the server does not, the server logs will continue to be detailed.
+
+Building from Source
+--------------------
+
+If you'd like to build SMProxy from source, there are several ways to go about it.
+
+* Windows *
+
+Make sure you have .NET 4.0 installed.  Then, add "C:\Windows\Microsoft.NET\Framework64\v4.0.30319" to your path.  Run "msbuild" from /SMProxy to build SMProxy.
+
+You can also open and edit the solution with Visual Studio 2010 or better, and SharpDevelop 4.0 or better.
+
+* Linux *
+
+Install the "mono-complete" package.  Then, run "xbuild" from /SMProxy to build SMProxy.
+
+You can also open and edit the solution with MonoDevelop 2.8 or better.
