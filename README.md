@@ -156,13 +156,13 @@ Building from Source
 
 If you'd like to build SMProxy from source, there are several ways to go about it.
 
-* Windows *
+*Windows*
 
 Make sure you have .NET 4.0 installed.  Then, add "C:\Windows\Microsoft.NET\Framework64\v4.0.30319" to your path.  Run "msbuild" from /SMProxy to build SMProxy.
 
 You can also open and edit the solution with Visual Studio 2010 or better, and SharpDevelop 4.0 or better.
 
-* Linux *
+*Linux*
 
 Install the "mono-complete" package.  Then, run "xbuild" from /SMProxy to build SMProxy.
 
