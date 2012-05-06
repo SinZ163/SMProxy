@@ -263,6 +263,13 @@ namespace SMProxy
             return ReadByte() == 1;
         }
 
+        public Boolean ReadBoolean(bool p)
+        {
+            s.ReadByte();
+            Payload = Payload.Concat(new byte[] { (byte)(p ? 1 : 0) }).ToArray();
+            return p;
+        }
+
         /// <summary>
         /// Reads the bytes.
         /// </summary>
