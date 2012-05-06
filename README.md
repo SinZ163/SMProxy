@@ -1,7 +1,7 @@
 SMProxy
 ======
 
-SMProxy is a tool for debugging protocol communication with a Minecraft server, currently supporting Minecraft 1.2.4.
+SMProxy is a tool for debugging protocol communication with a Minecraft server, currently supporting Minecraft 1.2.5.
 
 SMProxy runs on Windows with Microsoft.NET and Mono, and on Linux/Mac with Mono.
 
@@ -10,7 +10,7 @@ Make sure that you use mono-complete on Linux/Mac.  For Linux with Aptitude, use
 Compatability
 -----------
 
-If you are interested in using SMProxy for versions other than 1.2.4, check the /compatability directory for premade packet definitions for older versions of the protocol.
+If you are interested in using SMProxy for versions other than 1.2.5, check the /compatability directory for premade packet definitions for older versions of the protocol.
 
 Usage
 -----------

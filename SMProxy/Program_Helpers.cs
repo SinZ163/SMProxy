@@ -99,6 +99,7 @@ namespace SMProxy
                 (pr.Payload.Length / (uploadCompleteTime - uploadStartTime).TotalSeconds) + " bytes/sec); Proxy lag: " +
                 ((uploadCompleteTime - downloadStartTime) - (downloadStartTime - downloadCompleteTime)).TotalMilliseconds + " ms";
             sw.WriteLine(output);
+            sw.Flush();
         }
 
         static string DumpArray(byte[] resp)
