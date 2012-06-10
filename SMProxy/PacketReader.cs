@@ -209,6 +209,21 @@ namespace SMProxy
         }
 
         /// <summary>
+        /// Reads the short.
+        /// </summary>
+        /// <param name="s">The s.</param>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public short ReadShort(short value)
+        {
+            byte[] b = new byte[2];
+            s.Read(b, 0, 2);
+            int i = IPAddress.HostToNetworkOrder(BitConverter.ToInt16(b, 0));
+            Payload = Payload.Concat(MakeInt(value)).ToArray();
+            return value;
+        }
+
+        /// <summary>
         /// Reads the long.
         /// </summary>
         /// <param name="s">The s.</param>

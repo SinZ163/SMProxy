@@ -24,11 +24,12 @@ namespace SMProxy
                     return;
                 if (!ClientToServer && SuppressServer)
                     return;
+                string address = pr.Client.Client.RemoteEndPoint.ToString();
                 if (ClientToServer)
-                    sw.WriteLine("{" + DateTime.Now.ToLongTimeString() + "} [CLIENT->SERVER" + (Suppressed ? " SUPPRESSED" : "") + "]: " +
+                    sw.WriteLine("[" + address + "] {" + DateTime.Now.ToLongTimeString() + "} [CLIENT->SERVER" + (Suppressed ? " SUPPRESSED" : "") + "]: " +
                         ((LibMinecraft.Model.PacketID)PacketID).ToString() + " (0x" + PacketID.ToString("x") + ")");
                 else
-                    sw.WriteLine("{" + DateTime.Now.ToLongTimeString() + "} [SERVER->CLIENT" + (Suppressed ? " SUPPRESSED" : "") + "]: " +
+                    sw.WriteLine("[" + address + "] {" + DateTime.Now.ToLongTimeString() + "} [SERVER->CLIENT" + (Suppressed ? " SUPPRESSED" : "") + "]: " +
                         ((LibMinecraft.Model.PacketID)PacketID).ToString() + " (0x" + PacketID.ToString("x") + ")");
                 if (pr.Payload.Length == 0)
                     return;
