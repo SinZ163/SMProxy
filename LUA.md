@@ -7,7 +7,7 @@ SMProxy exposes a number of functions that a Lua script may use.  They each read
 
 Lua is not currently supported on Mono.
 
-They are:
+The supported functions are:
 
 * readByte()
 * readBytes(int)
