@@ -1,5 +1,5 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
+Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 11
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SMProxy", "SMProxy\SMProxy.csproj", "{D8134DD9-FEAB-4D83-81F3-AFF4583441BE}"
 EndProject
