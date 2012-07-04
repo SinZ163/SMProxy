@@ -24,6 +24,7 @@ namespace SMProxy
         static List<byte> ServerDenyPackets = new List<byte>();
         static int LocalPort = 25564, RemotePort = 25565;
         static int ProtocolVersion = 29;
+        static string Password = null;
         static string LocalEndpoint = "127.0.0.1", RemoteEndpoint = "127.0.0.1";
         static Dictionary<byte, string> CustomClientPackets = new Dictionary<byte, string>();
         static Dictionary<byte, string> CustomServerPackets = new Dictionary<byte, string>();
@@ -128,6 +129,10 @@ namespace SMProxy
                     case "-pr":
                     case "--enable-profiling":
                         EnableProfiling = true;
+                        break;
+                    case "-pw":
+                    case "--password":
+                        Password = args[i++];
                         break;
                     case "-pv":
                     case "--protocol-version":

@@ -152,7 +152,8 @@ namespace SMProxy
                                 }
                                 else
                                 {
-                                    // Parse packet
+                                    // Client to Server
+                                    #region Client to Server
                                     switch (data)
                                     {
                                         case 0x00: // Keep-alive
@@ -314,6 +315,21 @@ namespace SMProxy
                                                 "Can Fly", pr.ReadBoolean(),
                                                 "Instant Mine", pr.ReadBoolean());
                                             break;
+                                        case 0xCB: // Tab Complete
+                                            LogPacket(outputLogger, true, 0xCB, pr,
+                                                "Text", pr.ReadString());
+                                            break;
+                                        case 0xCC: // Locale and View Distance
+                                            LogPacket(outputLogger, true, 0xCC, pr,
+                                                "Locale", pr.ReadString(),
+                                                "View Distance", pr.ReadByte(),
+                                                "Chat Flags", pr.ReadByte(),
+                                                "Difficulty", pr.ReadByte());
+                                            break;
+                                        case 0xCD: // Client Status
+                                            LogPacket(outputLogger, true, 0xCD, pr,
+                                                "Payload", pr.ReadByte());
+                                            break;
                                         case 0xFA: // Plugin Message
                                             string s = pr.ReadString();
                                             short l = pr.ReadShort();
@@ -321,6 +337,17 @@ namespace SMProxy
                                                 "Channel", s,
                                                 "Length", l,
                                                 "Data", pr.Read(l));
+                                            break;
+                                        case 0xFC: // Encryption Key Response
+                                            short keyLength = pr.ReadShort();
+                                            byte[] key = pr.ReadBytes(keyLength);
+                                            short verifyLength = pr.ReadShort();
+                                            LogPacket(outputLogger, true, 0xFC, pr,
+                                                 "Key Length", keyLength,
+                                                 "Key", key,
+                                                 "Verify Token Length", verifyLength,
+                                                 "Verify Token", pr.ReadBytes(verifyLength));
+                                            // TODO: Handle encryption
                                             break;
                                         case 0xFE: // Server List Ping
                                             LogPacket(outputLogger, true, 0xFE, pr);
@@ -338,6 +365,7 @@ namespace SMProxy
                                             outputLogger.WriteLine("WARNING: Client sent unrecognized packet (0x" + data.ToString("x") + ")!  Switching to raw log mode.");
                                             break;
                                     }
+                                    #endregion
                                 }
                             }
                             catch (Exception e)
@@ -463,6 +491,8 @@ namespace SMProxy
                                 }
                                 else
                                 {
+                                    // Server to Client
+                                    #region Server to Client
                                     switch (data)
                                     {
                                         case 0x00: // Keep-alive
@@ -925,6 +955,7 @@ namespace SMProxy
                                             outputLogger.WriteLine("WARNING: Server sent unrecognized packet (0x" + data.ToString("x") + ")!  Switching to raw log mode.");
                                             break;
                                     }
+                                    #endregion
                                 }
                             }
                             catch (Exception e)
