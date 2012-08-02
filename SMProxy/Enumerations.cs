@@ -196,13 +196,9 @@ namespace LibMinecraft.Model
         SetExperience = 0x2B,
         // ...
         /// <summary>
-        /// This packet is used to notify the client either to initialize or unload the following chunk(s)
-        /// </summary>
-        MapColumnAllocation = 0x32,
-        /// <summary>
         /// this is date about the map and the chunks are usually 16^3
         /// </summary>
-        MapChunks = 0x33,
+        ChunkData = 0x33,
         /// <summary>
         /// This is called when multiple blocks have been changed within a region at one time
         /// </summary>
@@ -215,6 +211,8 @@ namespace LibMinecraft.Model
         /// This packet is sent when blocks such as chests have been used in order to show their animation
         /// </summary>
         BlockAction = 0x36,
+        BlockBreakAnimation = 0x37,
+        BulkChunkData = 0x38,
         // ...
         /// <summary>
         /// This packet is sent when an explosion occurs either by creeper or TNT
@@ -224,6 +222,7 @@ namespace LibMinecraft.Model
         /// Sent to the client when it is to play a sound.
         /// </summary>
         SoundOrParticleEffect = 0x3D,
+        NamedSoundEffect = 0x3E,
         // ...
         /// <summary>
         /// This packet is currently sent when either a bed cant be used as a spawn point or when the raining state changes 
@@ -292,11 +291,17 @@ namespace LibMinecraft.Model
         /// this is a packet sent to the client in order to update the player list (when Tab is pressed)
         /// </summary>
         PlayerListItem = 0xC9,
+        PlayerAbilities = 0xCA,
+        TabComplete = 0xCB,
+        LocaleAndViewDistance = 0xCC,
+        ClientStatus = 0xCD,
         // ...
         /// <summary>
         /// This packet is used by mods and plugins to send any data that they may need
         /// </summary>
         PluginMessage = 0xFA,
+        EncryptionKeyResponse = 0xFC,
+        EncryptionKeyRequest = 0xFD,
         // ...
         /// <summary>
         /// This packet is used by the client to get a kick response with server information, in order to list the information on the multiplayer menu.

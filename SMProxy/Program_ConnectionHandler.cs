@@ -18,6 +18,8 @@ namespace SMProxy
         private static void HandleConnection(StreamWriter outputLogger, TcpClient client, string ServerAddress, int RemotePort)
         {
             TcpClient server = null;
+            string ClientUsername, ClientSessionId;
+            byte[] serverSharedSecret, clientSharedSecret;
 
             bool ClientDirty = false, ServerDirty = false;
             Console.WriteLine("Connected to remote server.");
@@ -41,8 +43,7 @@ namespace SMProxy
                         }
 
                         byte data = pr.ReadByte();
-                        if (data != 0x02 && server == null)
-                            server = new TcpClient(ServerAddress, RemotePort);
+                        server = new TcpClient(ServerAddress, RemotePort);
 
                         if (ClientDirty)
                         {
@@ -168,29 +169,35 @@ namespace SMProxy
                                             pr.Read(11);
                                             break;
                                         case 0x02: // Handshake
-                                            string usernameAndHost = pr.ReadString();
-                                            LogPacket(outputLogger, true, 0x02, pr,
-                                                "Username/Hostname", usernameAndHost);
-                                            if (usernameAndHost.Contains(";"))
+                                            LogPacket(outputLogger, true, 0x00, pr,
+                                                "Protocol Version", pr.ReadByte(),
+                                                "Username", ClientUsername = pr.ReadString(),
+                                                "Server Hostname", pr.ReadString(),
+                                                "Server Port", pr.ReadInt());
+                                            ClientSessionId = null;
+                                            Console.WriteLine("Authentication required for " + ClientUsername + ".");
+                                            while (ClientSessionId == null)
                                             {
-                                                string[] parts = usernameAndHost.Split(';');
-                                                string[] host = parts[1].Split(':');
-                                                int port = 25565;
-                                                if (host.Length != 1)
-                                                    port = int.Parse(host[1]);
-                                                if (VirtualHosts.ContainsKey(host[0] + ":" + port.ToString()))
+                                                Console.Write("Enter Minecraft.net username: ");
+                                                string loginName = Console.ReadLine();
+                                                Console.Write("Enter password: ");
+                                                string loginPass = ReadPassword();
+                                                Console.WriteLine();
+                                                try
                                                 {
-                                                    host = VirtualHosts[host[0] + ":" + port.ToString()].Split(':');
-                                                    port = 25565;
-                                                    if (host.Length != 1)
-                                                        port = int.Parse(host[1]);
-                                                    server = new TcpClient(host[0], port);
+                                                    WebClient wc = new WebClient();
+                                                    var sr = new StreamReader(wc.OpenRead("https://login.minecraft.net?user=" + Uri.EscapeUriString(loginName) +
+                                                        "&password=" + Uri.EscapeUriString(loginPass) + "&version=13"));
+                                                    string response = sr.ReadToEnd();
+                                                    sr.Close();
+                                                    string[] parts = response.Split(':');
+                                                    ClientSessionId = parts[3];
                                                 }
-                                                else
-                                                    server = new TcpClient(ServerAddress, RemotePort);
+                                                catch
+                                                {
+                                                    Console.WriteLine("Authentication failed.");
+                                                }
                                             }
-                                            else
-                                                server = new TcpClient(ServerAddress, RemotePort);
                                             break;
                                         case 0x03: // Chat Message
                                             string msg = pr.ReadString();
@@ -253,7 +260,10 @@ namespace SMProxy
                                                 "Y", pr.ReadByte(),
                                                 "Z", pr.ReadInt(),
                                                 "Direction", pr.ReadByte(),
-                                                "Held Item", pr.ReadSlot());
+                                                "Held Item", pr.ReadSlot(),
+                                                "Cursor X", pr.ReadByte(),
+                                                "Cursor Y", pr.ReadByte(),
+                                                "Cursor Z", pr.ReadByte());
                                             break;
                                         case 0x10: // Held Item Change
                                             LogPacket(outputLogger, true, 0x10, pr,
@@ -276,7 +286,7 @@ namespace SMProxy
                                         case 0x66: // Click Window
                                             LogPacket(outputLogger, true, 0x66, pr,
                                                 "Window ID", pr.ReadByte(),
-                                                "Slot ID", pr.ReadShort(),
+                                                "Slot Index", pr.ReadShort(),
                                                 "Right Click", pr.ReadBoolean(),
                                                 "Action Number", pr.ReadShort(),
                                                 "Shift", pr.ReadBoolean(),
@@ -310,10 +320,9 @@ namespace SMProxy
                                             break;
                                         case 0xCA: // Player Abilities
                                             LogPacket(outputLogger, true, 0xCA, pr,
-                                                "Invulnerable", pr.ReadBoolean(),
-                                                "Is Flying", pr.ReadBoolean(),
-                                                "Can Fly", pr.ReadBoolean(),
-                                                "Instant Mine", pr.ReadBoolean());
+                                                "Flags", pr.ReadByte(),
+                                                "Flying Speed", pr.ReadByte(),
+                                                "Walking Speed", pr.ReadByte());
                                             break;
                                         case 0xCB: // Tab Complete
                                             LogPacket(outputLogger, true, 0xCB, pr,
@@ -502,17 +511,12 @@ namespace SMProxy
                                         case 0x01: // Login Request
                                             LogPacket(outputLogger, false, 0x01, pr,
                                                 "Entity ID", pr.ReadInt(),
-                                                "[unused]", pr.ReadString(),
                                                 "Level Type", pr.ReadString(),
-                                                "Server Mode", pr.ReadInt(),
-                                                "Dimension", pr.ReadInt(),
+                                                "Server Mode", pr.ReadByte(),
+                                                "Dimension", pr.ReadByte(),
                                                 "Difficulty", pr.ReadByte(),
-                                                "World Height", pr.ReadByte(),
+                                                "[Unused]", pr.ReadByte(),
                                                 "Max Players", pr.ReadByte());
-                                            break;
-                                        case 0x02: // Handshake
-                                            LogPacket(outputLogger, false, 0x02, pr,
-                                                "Server Hash", pr.ReadString());
                                             break;
                                         case 0x03: // Chat Message
                                             string msg = pr.ReadString();
@@ -527,9 +531,8 @@ namespace SMProxy
                                         case 0x05: // Entity Equipment
                                             LogPacket(outputLogger, false, 0x05, pr,
                                                 "Entity ID", pr.ReadInt(),
-                                                "Slot", pr.ReadShort(),
-                                                "Item ID", pr.ReadShort(),
-                                                "Damage", pr.ReadShort());
+                                                "Slot Index", pr.ReadShort(),
+                                                "Slot", pr.ReadSlot());
                                             break;
                                         case 0x06: // Spawn Position
                                             LogPacket(outputLogger, false, 0x06, pr,
@@ -591,7 +594,8 @@ namespace SMProxy
                                                 "Z", pr.ReadInt(),
                                                 "Yaw", pr.ReadByte(),
                                                 "Pitch", pr.ReadByte(),
-                                                "Current Item", pr.ReadShort());
+                                                "Current Item", pr.ReadShort(),
+                                                "Metadata", pr.ReadMobMetadata());
                                             break;
                                         case 0x15: // Spawn Dropped Item
                                             LogPacket(outputLogger, false, 0x15, pr,
@@ -617,7 +621,7 @@ namespace SMProxy
                                             int X = pr.ReadInt();
                                             int Y = pr.ReadInt();
                                             int Z = pr.ReadInt();
-                                            int fireballID = pr.ReadInt();
+                                            int fireballID = pr.ReadInt(); // TODO: Update this to be accurate
                                             if (fireballID == 0)
                                             {
                                                 LogPacket(outputLogger, false, 0x17, pr,
@@ -652,6 +656,9 @@ namespace SMProxy
                                                 "Yaw", pr.ReadByte(),
                                                 "Pitch", pr.ReadByte(),
                                                 "Head Yaw", pr.ReadByte(),
+                                                "Velocity X", pr.ReadShort(),
+                                                "Velocity Y", pr.ReadShort(),
+                                                "Velocity Z", pr.ReadShort(),
                                                 "Metadata", pr.ReadMobMetadata());
                                             break;
                                         case 0x19: // Spawn Painting
@@ -679,8 +686,10 @@ namespace SMProxy
                                                 "Velocity Z", pr.ReadShort());
                                             break;
                                         case 0x1D: // Destroy Entity
+                                            byte entityCount;
                                             LogPacket(outputLogger, false, 0x1D, pr,
-                                                "Entity ID", pr.ReadInt());
+                                                "Entity Count", entityCount = pr.ReadByte(),
+                                                "Entity Array", pr.ReadBytes(entityCount));
                                             break;
                                         case 0x1E: // Entity
                                             LogPacket(outputLogger, false, 0x1E, pr,
@@ -755,12 +764,6 @@ namespace SMProxy
                                                 "Level", pr.ReadShort(),
                                                 "Total", pr.ReadShort());
                                             break;
-                                        case 0x32: // Map Column Allocation
-                                            LogPacket(outputLogger, false, 0x32, pr,
-                                                "X", pr.ReadInt(),
-                                                "Z", pr.ReadInt(),
-                                                "Allocate", pr.ReadBoolean());
-                                            break;
                                         case 0x33: // Map Chunks
                                             int mapX = pr.ReadInt();
                                             int mapZ = pr.ReadInt();
@@ -775,8 +778,7 @@ namespace SMProxy
                                                 "Primary Bit Map", primaryBitMap,
                                                 "Add Bit Map", addBitMap,
                                                 "Compressed Size", compressedSize,
-                                                "[unused]", pr.ReadInt(),
-                                                "Data", pr.Read(compressedSize));
+                                                "Compressed Data", pr.Read(compressedSize));
                                             break;
                                         case 0x34: // Multi-Block Change
                                             int cX = pr.ReadInt();
@@ -795,7 +797,7 @@ namespace SMProxy
                                                 "X", pr.ReadInt(),
                                                 "Y", pr.ReadByte(),
                                                 "Z", pr.ReadInt(),
-                                                "ID", pr.ReadByte(),
+                                                "Block Type", pr.ReadShort(),
                                                 "Metadata", pr.ReadByte());
                                             break;
                                         case 0x36: // Block Action
@@ -804,7 +806,24 @@ namespace SMProxy
                                                 "Y", pr.ReadShort(),
                                                 "Z", pr.ReadInt(),
                                                 "Data[0]", pr.ReadByte(),
-                                                "Data[1]", pr.ReadByte());
+                                                "Data[1]", pr.ReadByte(),
+                                                "Block Type", pr.ReadShort());
+                                            break;
+                                        case 0x37: // Block Break Animation
+                                            LogPacket(outputLogger, false, 0x37, pr,
+                                                "Entity ID", pr.ReadInt(),
+                                                "X", pr.ReadInt(),
+                                                "Y", pr.ReadInt(),
+                                                "Z", pr.ReadInt(),
+                                                "Stage", pr.ReadByte());
+                                            break;
+                                        case 0x38: // Map chunk bulk
+                                            int chunkDataSize, columnCount;
+                                            LogPacket(outputLogger, false, 0x38, pr,
+                                                "Column Count", columnCount = pr.ReadShort(),
+                                                "Chunk Data Length", chunkDataSize = pr.ReadInt(),
+                                                "Chunk Data", pr.ReadBytes(chunkDataSize),
+                                                "Chunk Metadata", pr.ReadBytes(columnCount * 7));
                                             break;
                                         case 0x3C: // Explosion
                                             double eX = pr.ReadDouble();
@@ -816,9 +835,12 @@ namespace SMProxy
                                                 "X", eX,
                                                 "Y", eY,
                                                 "Z", eZ,
-                                                "[unknown]", unknown,
-                                                "Blocks Affected", blocksAffected,
-                                                "Data", pr.Read(blocksAffected * 3));
+                                                "Radius", unknown,
+                                                "Blocks Affected Count", blocksAffected,
+                                                "Blocks Affected", pr.Read(blocksAffected * 3),
+                                                "[Unknown]", pr.ReadFloat(),
+                                                "[Unknown]", pr.ReadFloat(),
+                                                "[Unknown]", pr.ReadFloat());
                                             break;
                                         case 0x3D: // Sound/Particle Effect
                                             LogPacket(outputLogger, false, 0x3D, pr,
@@ -827,6 +849,15 @@ namespace SMProxy
                                                 "Y", pr.ReadByte(),
                                                 "Z", pr.ReadInt(),
                                                 "Data", pr.ReadInt());
+                                            break;
+                                        case 0x3E: // Named sound effect
+                                            LogPacket(outputLogger, false, 0x3E, pr,
+                                                "Sound Name", pr.ReadString(),
+                                                "Position X", pr.ReadInt(),
+                                                "Position Y", pr.ReadInt(),
+                                                "Position Z", pr.ReadInt(),
+                                                "Volume", pr.ReadFloat(),
+                                                "Pitch", pr.ReadByte());
                                             break;
                                         case 0x46: // Change Game State
                                             LogPacket(outputLogger, false, 0x46, pr,
@@ -883,6 +914,11 @@ namespace SMProxy
                                                 "Action Number", pr.ReadShort(),
                                                 "Accepted", pr.ReadBoolean());
                                             break;
+                                        case 0x6B: // Creative Inventory Action
+                                            LogPacket(outputLogger, false, 0x6B, pr,
+                                                "Slot ID", pr.ReadShort(),
+                                                "Clicked Item", pr.ReadSlot());
+                                            break;
                                         case 0x82: // Update Sign
                                             LogPacket(outputLogger, false, 0x82, pr,
                                                 "X", pr.ReadInt(),
@@ -904,14 +940,14 @@ namespace SMProxy
                                                 "Data", pr.Read(length));
                                             break;
                                         case 0x84: // Update Tile Entity
+                                            int dataLength;
                                             LogPacket(outputLogger, false, 0x84, pr,
                                                 "X", pr.ReadInt(),
                                                 "Y", pr.ReadShort(),
                                                 "Z", pr.ReadInt(),
                                                 "Action", pr.ReadByte(),
-                                                "Data[0]", pr.ReadInt(),
-                                                "Data[1]", pr.ReadInt(),
-                                                "Data[2]", pr.ReadInt());
+                                                "Data Length", dataLength = pr.ReadShort(),
+                                                "Data", pr.ReadBytes(dataLength));
                                             break;
                                         case 0xC8: // Update Statistic
                                             LogPacket(outputLogger, false, 0xC8, pr,
@@ -925,11 +961,14 @@ namespace SMProxy
                                                 "Ping", pr.ReadShort());
                                             break;
                                         case 0xCA: // Player Abilities
-                                            LogPacket(outputLogger, true, 0xCA, pr,
-                                                "Invulnerable", pr.ReadBoolean(),
-                                                "Is Flying", pr.ReadBoolean(),
-                                                "Can Fly", pr.ReadBoolean(),
-                                                "Instant Mine", pr.ReadBoolean());
+                                            LogPacket(outputLogger, false, 0xCA, pr,
+                                                "Flags", pr.ReadByte(),
+                                                "Flying Speed", pr.ReadByte(),
+                                                "Walking Speed", pr.ReadByte());
+                                            break;
+                                        case 0xCB: // Tab complete
+                                            LogPacket(outputLogger, false, 0xCB, pr,
+                                                "Text", pr.ReadString());
                                             break;
                                         case 0xFA: // Plugin Message
                                             string s = pr.ReadString();
@@ -938,6 +977,26 @@ namespace SMProxy
                                                 "Channel", s,
                                                 "Length", l,
                                                 "Data", pr.Read(l));
+                                            break;
+                                        case 0xFC: // Encryption Key Response
+                                            short keyLength = pr.ReadShort();
+                                            byte[] key = pr.ReadBytes(keyLength);
+                                            short verifyLength = pr.ReadShort();
+                                            LogPacket(outputLogger, false, 0xFC, pr,
+                                                 "Key Length", keyLength,
+                                                 "Key", key,
+                                                 "Verify Token Length", verifyLength,
+                                                 "Verify Token", pr.ReadBytes(verifyLength));
+                                            // TODO: Handle encryption
+                                            break;
+                                        case 0xFD: // Encryption Key Request
+                                            int publicKeyLength, verifyTokenLength;
+                                            LogPacket(outputLogger, false, 0xFD, pr,
+                                                "Server ID", pr.ReadString(),
+                                                "Public Key Length", publicKeyLength = pr.ReadShort(),
+                                                "Public Key", pr.ReadBytes(publicKeyLength),
+                                                "Verify Token Length", verifyTokenLength = pr.ReadShort(),
+                                                "Verify Token", pr.ReadBytes(verifyTokenLength));
                                             break;
                                         case 0xFE: // Server List Ping
                                             LogPacket(outputLogger, false, 0xFE, pr);
@@ -987,6 +1046,20 @@ namespace SMProxy
             }
 
             Console.WriteLine("Disconnected.");
+        }
+
+        private static string ReadPassword()
+        {
+            string result = "";
+            ConsoleKeyInfo cki;
+            while ((cki = Console.ReadKey(true)).Key != ConsoleKey.Enter)
+            {
+                if (cki.Key == ConsoleKey.Backspace)
+                    result = result.Remove(result.Length - 1);
+                else
+                    result += cki.KeyChar; // TODO: Improve this
+            }
+            return result;
         }
     }
 }

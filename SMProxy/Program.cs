@@ -30,7 +30,6 @@ namespace SMProxy
         static Dictionary<byte, string> CustomServerPackets = new Dictionary<byte, string>();
         static Dictionary<byte, string> CustomClientScripts = new Dictionary<byte, string>();
         static Dictionary<byte, string> CustomServerScripts = new Dictionary<byte, string>();
-        static Dictionary<string, string> VirtualHosts = new Dictionary<string, string>();
         static StreamWriter outputLogger = null;
 
         static void DisplayHelp()
@@ -73,8 +72,7 @@ namespace SMProxy
                 "\tafter a single session is complete.\n\tAlternate: --persistent-session\n" +
                 "-is [packet name]:[packet]:[direction]:[file]: Import a Lua script for a packet.\n" +
                 "\tSee http://tinyurl.com/smproxy-lua for details.\n" +
-                "\tAlternate: --import-script\n" +
-                "-vh [host];[destination]: Add virtual host.\n\t--Alternate: --virtual-host");
+                "\tAlternate: --import-script\n");
         }
 
         static void Main(string[] args)
@@ -205,24 +203,6 @@ namespace SMProxy
                             CustomServerScripts.Add(id, parts[0] + ":" + parts[3]);
                         i++;
                         break;
-                    case "-vh":
-                    case "--virtual-host":
-                        parts = args[i + 1].Split(';');
-                        string[] host = parts[0].Split(':');
-                        int port = 25565;
-                        if (host.Length != 1)
-                            port = int.Parse(host[1]);
-                        string target = (host[0] + ":" + port).ToString();
-
-                        host = parts[1].Split(':');
-                        port = 25565;
-                        if (host.Length != 0)
-                            port = int.Parse(host[1]);
-
-                        VirtualHosts.Add(target, (host[0] + ":" + port).ToString());
-
-                        i++;
-                        break;
                     default:
                         RemoteEndpoint = args[i];
                         return;
@@ -300,8 +280,7 @@ namespace SMProxy
             if (PersistentSessions)
             {
                 Listener.BeginAcceptTcpClient(AcceptAsync, null);
-
-                while (Console.ReadLine() != "quit") ;
+                while (true) Thread.Sleep(1);
             }
             else
             {

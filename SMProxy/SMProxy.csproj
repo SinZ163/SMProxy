@@ -26,6 +26,7 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <Externalconsole>True</Externalconsole>
     <Commandlineparameters>--persistent-session 127.0.0.1</Commandlineparameters>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -36,8 +37,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BouncyCastle.Crypto">
+      <HintPath>..\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
     <Reference Include="NCalc">
       <HintPath>..\NCalc.dll</HintPath>
     </Reference>
@@ -61,6 +66,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BerDecodeError.cs" />
+    <Compile Include="BigInteger.cs" />
+    <Compile Include="Cryptography.cs" />
     <Compile Include="Enumerations.cs" />
     <Compile Include="Packet.cs" />
     <Compile Include="PacketReader.cs" />
