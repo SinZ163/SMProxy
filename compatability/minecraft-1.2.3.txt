@@ -1,4 +1,0 @@
-# Compatability layer for Minecraft 1.2.3 with SMProxy
-
--sp CA:CS
--pv 29
