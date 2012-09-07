@@ -7,9 +7,13 @@ namespace SMProxy.Packets
 {
     public class HandshakePacket : Packet
     {
+        [FieldDescription("The protocol version of the client")]
         public byte ProtocolVersion;
+        [FieldDescription("The username of the connecting player")]
         public string Username;
+        [FieldDescription("The hostname provided by the client when connecting")]
         public string Hostname;
+        [FieldDescription("The port provided by the client when connecting")]
         public int ServerPort;
 
         public override byte PacketId

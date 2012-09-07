@@ -25,15 +25,17 @@ namespace SMProxy
             ServerKey = CryptoServiceProvider.ExportParameters(true);
         }
 
-        public Proxy(ILogProvider logProvider)
+        public Proxy(ILogProvider logProvider, ProxySettings settings)
         {
             LocalEncryptionEnabled = RemoteEncryptionEnabled = false;
             LocalBuffer = new byte[BufferSize];
             RemoteBuffer = new byte[BufferSize];
             IsLocalRaw = IsRemoteRaw = false;
             LogProvider = logProvider;
+            Settings = settings;
         }
 
+        public ProxySettings Settings;
         public Socket LocalSocket, RemoteSocket;
         public bool LocalEncryptionEnabled, RemoteEncryptionEnabled;
         public BufferedBlockCipher LocalEncrypter, LocalDecrypter;

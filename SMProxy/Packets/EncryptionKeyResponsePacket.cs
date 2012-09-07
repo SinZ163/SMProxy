@@ -12,7 +12,10 @@ namespace SMProxy.Packets
 {
     public class EncryptionKeyResponsePacket : Packet
     {
-        public byte[] SharedSecret, VerifyToken;
+        [FieldDescription("The shared secret key for use in encryption (SMProxy overrides this)")]
+        public byte[] SharedSecret;
+        [FieldDescription("The verify token from 0xFD, encrypted with the server's public key")]
+        public byte[] VerifyToken;
 
         public override byte PacketId
         {

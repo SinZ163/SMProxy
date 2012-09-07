@@ -32,7 +32,7 @@ namespace SMProxy
             sb.AppendFormat(" (0x{0})", packet.PacketId.ToString("X2"));
             sb.AppendLine();
             sb.Append(DataUtility.DumpArrayPretty(packet.Payload));
-            sb.AppendLine(packet.ToString());
+            sb.AppendLine(packet.ToString(proxy));
             stream.Write(sb.ToString());
             stream.Flush();
         }

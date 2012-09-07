@@ -57,14 +57,21 @@ namespace SMProxy
         /// <summary>
         /// Converts the packet to a human-readable format.
         /// </summary>
-        public override string ToString()
+        public string ToString(Proxy proxy)
         {
             Type type = GetType();
             string value = "";
             FieldInfo[] fields = type.GetFields();
             foreach (FieldInfo field in fields)
             {
-                value += "    " + field.Name + ": " + field.GetValue(this) + "\n";
+                value += "    " + field.Name;
+                if (proxy.Settings.DisplayDescriptions)
+                {
+                    var attributes = field.GetCustomAttributesData();
+                    foreach (var attribute in attributes)
+                        value += " [" + attribute.ConstructorArguments[0].ToString() + "]";
+                }
+                value += ": " + field.GetValue(this) + "\n";
             }
             return value.Remove(value.Length - 1);
         }

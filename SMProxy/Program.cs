@@ -30,7 +30,8 @@ namespace SMProxy
             remote.Connect(destination);
             string fileName = "log-" + DateTime.Now.ToShortTimeString() + local.RemoteEndPoint + ".txt";
             fileName = fileName.Replace(':', '-');
-            var proxy = new Proxy(new FileLogProvider(fileName));
+            var proxy = new Proxy(new FileLogProvider(fileName), new ProxySettings());
+            proxy.Settings.DisplayDescriptions = true;
             proxy.Start(local, remote);
             LocalListener.BeginAccept(AcceptConnection, null);
         }

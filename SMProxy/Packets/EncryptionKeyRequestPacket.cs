@@ -9,8 +9,11 @@ namespace SMProxy.Packets
 {
     public class EncryptionKeyRequestPacket : Packet
     {
+        [FieldDescription("The server ID for authentication. \"-\" indicates offline mode")]
         public string ServerId;
+        [FieldDescription("The server's public key for encrypting the shared key")]
         public byte[] PublicKey;
+        [FieldDescription("The \"verify token\" for avoiding session playback (does not work)")]
         public byte[] VerifyToken;
 
         public override byte PacketId

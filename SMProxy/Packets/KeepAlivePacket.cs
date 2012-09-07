@@ -7,6 +7,7 @@ namespace SMProxy.Packets
 {
     public class KeepAlivePacket : Packet
     {
+        [FieldDescription("The keep alive value, to be echoed to the server")]
         public int KeepAlive;
 
         public override byte PacketId
