@@ -14,7 +14,7 @@ namespace SMProxy
     {
         public const int ProtocolVersion = 39;
 
-        private const int BufferSize = 4096 * 64;
+        private const int BufferSize = 4096 * 64; // TODO: Dynamic buffer resizing
         internal static RSAParameters ServerKey;
         internal static RSACryptoServiceProvider CryptoServiceProvider;
 
@@ -88,7 +88,7 @@ namespace SMProxy
                             else
                                 RemoteSocket.BeginSend(packet.Payload, 0, packet.Payload.Length, SocketFlags.None, null, null);
                         }
-                        throw new InvalidOperationException("Invalid packet: 0x" + packet.PacketId.ToString("X2"));
+                        throw new InvalidOperationException("Unrecognized packet: 0x" + packet.PacketId.ToString("X2"));
                     }
                     packet.HandlePacket(this);
                     LogProvider.Log(packet, this);
@@ -170,7 +170,7 @@ namespace SMProxy
                             else
                                 LocalSocket.BeginSend(packet.Payload, 0, packet.Payload.Length, SocketFlags.None, null, null);
                         }
-                        throw new InvalidOperationException("Invalid packet: 0x" + packet.PacketId.ToString("X2"));
+                        throw new InvalidOperationException("Unrecognized packet: 0x" + packet.PacketId.ToString("X2"));
                     }
                     packet.HandlePacket(this);
                     LogProvider.Log(packet, this);
