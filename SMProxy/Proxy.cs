@@ -106,6 +106,38 @@ namespace SMProxy
             }
         }
 
+        private void HandleLocalRaw(IAsyncResult result)
+        {
+            SocketError error;
+            int length = LocalSocket.EndReceive(result, out error);
+            if (error != SocketError.Success || !LocalSocket.Connected || length == 0)
+            {
+                if (error != SocketError.Success)
+                {
+                    // TODO: Log error
+                    Console.WriteLine("Local error: " + error.ToString());
+                }
+                // Disconnect
+                return;
+            }
+
+            byte[] payload = new byte[length];
+            Array.Copy(LocalBuffer, 0, payload, 0, length);
+
+            if (LocalEncryptionEnabled)
+                payload = LocalDecrypter.ProcessBytes(payload);
+
+            LogProvider.Raw(payload, this, PacketContext.ClientToServer);
+
+            if (RemoteEncryptionEnabled)
+                payload = RemoteEncrypter.ProcessBytes(payload);
+
+            if (RemoteSocket.Connected)
+                RemoteSocket.BeginSend(payload, 0, payload.Length, SocketFlags.None, null, null);
+            if (LocalSocket.Connected)
+                LocalSocket.BeginReceive(LocalBuffer, 0, LocalBuffer.Length, SocketFlags.None, HandleLocalRaw, null);
+        }
+
         internal void HandleRemotePackets(IAsyncResult result)
         {
             SocketError error;
@@ -147,49 +179,14 @@ namespace SMProxy
 
                 if (LocalEncryptionEnabled)
                     payload = LocalEncrypter.ProcessBytes(payload);
-                LogProvider.Log("Encrypted: " + DataUtility.DumpArray(payload));
 
                 LocalSocket.BeginSend(payload, 0, payload.Length, SocketFlags.None, null, null);
                 RemoteSocket.BeginReceive(RemoteBuffer, 0, RemoteBuffer.Length, SocketFlags.None, HandleRemoteRaw, null);
             }
         }
 
-        private void HandleLocalRaw(IAsyncResult result)
-        {
-            Console.WriteLine("Local raw handler triggered");
-            SocketError error;
-            int length = LocalSocket.EndReceive(result, out error);
-            if (error != SocketError.Success || !LocalSocket.Connected || length == 0)
-            {
-                if (error != SocketError.Success)
-                {
-                    // TODO: Log error
-                    Console.WriteLine("Local error: " + error.ToString());
-                }
-                // Disconnect
-                return;
-            }
-
-            byte[] payload = new byte[length];
-            Array.Copy(LocalBuffer, 0, payload, 0, length);
-
-            if (LocalEncryptionEnabled)
-                LocalDecrypter.ProcessBytes(payload);
-
-            LogProvider.Raw(payload, this, PacketContext.ClientToServer);
-
-            if (RemoteEncryptionEnabled)
-                payload = RemoteEncrypter.ProcessBytes(payload);
-
-            if (RemoteSocket.Connected)
-                RemoteSocket.BeginSend(payload, 0, payload.Length, SocketFlags.None, null, null);
-            if (LocalSocket.Connected)
-                LocalSocket.BeginReceive(LocalBuffer, 0, LocalBuffer.Length, SocketFlags.None, HandleLocalRaw, null);
-        }
-
         private void HandleRemoteRaw(IAsyncResult result)
         {
-            Console.WriteLine("Remote raw handler triggered");
             SocketError error;
             int length = RemoteSocket.EndReceive(result, out error);
             if (error != SocketError.Success || !RemoteSocket.Connected || length == 0)
@@ -207,7 +204,7 @@ namespace SMProxy
             Array.Copy(RemoteBuffer, 0, payload, 0, length);
 
             if (RemoteEncryptionEnabled)
-                RemoteDecrypter.ProcessBytes(payload);
+                payload = RemoteDecrypter.ProcessBytes(payload);
 
             LogProvider.Raw(payload, this, PacketContext.ServerToClient);
 
