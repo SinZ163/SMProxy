@@ -69,6 +69,7 @@
     <Compile Include="Packets\ChatMessagePacket.cs" />
     <Compile Include="Packets\EncryptionKeyResponsePacket.cs" />
     <Compile Include="Packets\EncryptionKeyRequestPacket.cs" />
+    <Compile Include="Packets\EntityActionPacket.cs" />
     <Compile Include="Packets\EntityEquipmentPacket.cs" />
     <Compile Include="Packets\HandshakePacket.cs" />
     <Compile Include="Packets\HeldItemChangePacket.cs" />
@@ -82,6 +83,7 @@
     <Compile Include="Packets\PlayerPositionAndLookPacket.cs" />
     <Compile Include="Packets\PlayerPositionPacket.cs" />
     <Compile Include="Packets\RespawnPacket.cs" />
+    <Compile Include="Packets\SpawnNamedEntityPacket.cs" />
     <Compile Include="Packets\SpawnPositionPacket.cs" />
     <Compile Include="Packets\TimeUpdatePacket.cs" />
     <Compile Include="Packets\UpdateHealthPacket.cs" />
