@@ -64,13 +64,11 @@ namespace SMProxy
             FieldInfo[] fields = type.GetFields();
             foreach (FieldInfo field in fields)
             {
-                value += "    " + field.Name;
-                if (proxy.Settings.DisplayDescriptions)
-                {
-                    var attributes = field.GetCustomAttributesData();
-                    foreach (var attribute in attributes)
-                        value += " [" + attribute.ConstructorArguments[0].ToString() + "]";
-                }
+                var name = Attribute.GetCustomAttribute(field, typeof(FriendlyNameAttribute)) as FriendlyNameAttribute;
+                if (name == null)
+                    value += "    " + field.Name;
+                else
+                    value += "    " + name.FriendlyName;
                 value += ": " + field.GetValue(this) + "\n";
             }
             return value.Remove(value.Length - 1);

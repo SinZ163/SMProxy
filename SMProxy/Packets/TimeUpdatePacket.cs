@@ -5,19 +5,19 @@ using System.Text;
 
 namespace SMProxy.Packets
 {
-    public class KeepAlivePacket : Packet
+    public class TimeUpdatePacket : Packet
     {
-        public int KeepAlive;
+        public long Time;
 
         public override byte PacketId
         {
-            get { return 0x00; }
+            get { return 0x04; }
         }
 
         public override int TryReadPacket(byte[] buffer, int length)
         {
             int offset = 1;
-            if (!DataUtility.TryReadInt32(buffer, ref offset, out KeepAlive))
+            if (!DataUtility.TryReadInt64(buffer, ref offset, out Time))
                 return -1;
             return offset;
         }

@@ -59,7 +59,6 @@
     <Compile Include="DataUtility.cs" />
     <Compile Include="Difficulty.cs" />
     <Compile Include="Dimension.cs" />
-    <Compile Include="FieldDescriptionAttribute.cs" />
     <Compile Include="FileLogProvider.cs" />
     <Compile Include="FriendlyNameAttribute.cs" />
     <Compile Include="GameMode.cs" />
@@ -74,8 +73,10 @@
     <Compile Include="Packets\InvalidPacket.cs" />
     <Compile Include="Packets\KeepAlivePacket.cs" />
     <Compile Include="Packets\LoginRequestPacket.cs" />
+    <Compile Include="Packets\RespawnPacket.cs" />
     <Compile Include="Packets\SpawnPositionPacket.cs" />
     <Compile Include="Packets\TimeUpdatePacket.cs" />
+    <Compile Include="Packets\UpdateHealthPacket.cs" />
     <Compile Include="Packets\UseEntityPacket.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
