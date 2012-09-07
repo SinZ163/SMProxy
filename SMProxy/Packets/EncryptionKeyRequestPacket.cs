@@ -44,6 +44,7 @@ namespace SMProxy.Packets
 
             AsnKeyParser keyParser = new AsnKeyParser(PublicKey);
             var key = keyParser.ParseRSAPublicKey();
+            
             var cryptoService = new RSACryptoServiceProvider();
             cryptoService.ImportParameters(key);
             byte[] encryptedSharedSecret = cryptoService.Encrypt(proxy.RemoteSharedKey, false);

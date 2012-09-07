@@ -59,8 +59,8 @@ namespace SMProxy.Packets
                 proxy.RemoteEncrypter.Init(true,
                                       new ParametersWithIV(new KeyParameter(proxy.RemoteSharedKey), proxy.RemoteSharedKey, 0, 16));
 
-                proxy.RemoteEncrypter = new BufferedBlockCipher(new CfbBlockCipher(new AesFastEngine(), 8));
-                proxy.RemoteEncrypter.Init(false,
+                proxy.RemoteDecrypter = new BufferedBlockCipher(new CfbBlockCipher(new AesFastEngine(), 8));
+                proxy.RemoteDecrypter.Init(false,
                                       new ParametersWithIV(new KeyParameter(proxy.RemoteSharedKey), proxy.RemoteSharedKey, 0, 16));
 
                 var response = new byte[] { 0xFC, 0x00, 0x00, 0x00, 0x00 };
