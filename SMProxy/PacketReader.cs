@@ -13,8 +13,8 @@ namespace SMProxy
 
         public static readonly Type[] PacketTypes =
             {
-                null, // 0x0
-                null, // 0x1
+                typeof(KeepAlivePacket), // 0x0
+                typeof(LoginRequestPacket), // 0x1
                 typeof(HandshakePacket), // 0x2
                 null, // 0x3
                 null, // 0x4
@@ -294,13 +294,8 @@ namespace SMProxy
                 Type packetType = PacketTypes[buffer[0]]; // Get the correct type to parse this packet
                 if (packetType == null)
                 {
-                    // Decrypt the buffer and throw
-                    if (packetContext == PacketContext.ClientToServer)
-                        Array.Copy(buffer, proxy.LocalBuffer, buffer.Length);
-                    else
-                        Array.Copy(buffer, proxy.RemoteBuffer, buffer.Length);
-                    throw new InvalidOperationException("Unknown packet: 0x" +
-                                                        buffer[0].ToString("X2"));
+                    results.Add(new InvalidPacket(buffer));
+                    return results;
                 }
                 var workingPacket = (Packet)Activator.CreateInstance(packetType);
                 workingPacket.PacketContext = packetContext;

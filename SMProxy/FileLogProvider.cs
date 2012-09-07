@@ -33,7 +33,7 @@ namespace SMProxy
             sb.AppendLine();
             sb.Append(DataUtility.DumpArrayPretty(packet.Payload));
             sb.AppendLine(packet.ToString());
-            stream.WriteLine(sb.ToString());
+            stream.Write(sb.ToString());
             stream.Flush();
         }
 
@@ -44,7 +44,7 @@ namespace SMProxy
                 sb.AppendLine("RAW {" + DateTime.Now.ToShortTimeString() + "} [CLIENT " + proxy.RemoteSocket.RemoteEndPoint + "->SERVER]: ");
             else
                 sb.AppendLine("RAW {" + DateTime.Now.ToShortTimeString() + "} [SERVER->CLIENT " + proxy.LocalSocket.RemoteEndPoint + "]: ");
-            sb.AppendLine(DataUtility.DumpArrayPretty(payload));
+            sb.Append(DataUtility.DumpArrayPretty(payload));
             stream.Write(sb.ToString());
             stream.Flush();
         }
