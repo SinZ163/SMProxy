@@ -1,5 +1,9 @@
-/SMProxy/bin/
-/SMProxy/obj/
+Debug/
+obj/
 *.user
-*.suo
 *.userprefs
+*.suo
+*.pidb
+_ReSharper*/
+TestResults/
+*.mdf
