@@ -80,6 +80,8 @@ namespace SMProxy
                     fieldValue = DataUtility.DumpArray(fValue as byte[]);
                 value += ": " + fieldValue + "\n";
             }
+            if (value.Length == 0)
+                return value;
             return value.Remove(value.Length - 1);
         }
 

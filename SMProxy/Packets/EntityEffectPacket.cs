@@ -8,7 +8,7 @@ namespace SMProxy.Packets
     public class EntityEffectPacket : Packet
     {
         public int EntityId;
-        public int EffectId;
+        public byte EffectId;
         public byte Amplifier;
         public short Duration;
 
@@ -22,7 +22,7 @@ namespace SMProxy.Packets
             int offset = 1;
             if (!DataUtility.TryReadInt32(buffer, ref offset, out EntityId))
                 return -1;
-            if (!DataUtility.TryReadInt32(buffer, ref offset, out EffectId))
+            if (!DataUtility.TryReadByte(buffer, ref offset, out EffectId))
                 return -1;
             if (!DataUtility.TryReadByte(buffer, ref offset, out Amplifier))
                 return -1;

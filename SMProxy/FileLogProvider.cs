@@ -13,7 +13,19 @@ namespace SMProxy
 
         public FileLogProvider(ProxySettings settings, string file)
         {
-            stream = new StreamWriter(file, true);
+            int number = 1;
+            while (stream == null)
+            {
+                try
+                {
+                    stream = new StreamWriter(file, true);
+                }
+                catch (IOException)
+                {
+                    file = number + file;
+                    number++;
+                }
+            }
             this.settings = settings;
             stream.WriteLine("Log opened on " + DateTime.Now.ToLongDateString() + " at " + DateTime.Now.ToLongTimeString());
             stream.WriteLine("Settings:");
@@ -45,7 +57,7 @@ namespace SMProxy
 
             StringBuilder sb = new StringBuilder();
             if (packet.PacketContext == PacketContext.ClientToServer)
-                sb.Append("{" + DateTime.Now.ToLongTimeString() + "} [CLIENT " + proxy.RemoteSocket.RemoteEndPoint + "->SERVER]: ");
+                sb.Append("{" + DateTime.Now.ToLongTimeString() + "} [CLIENT " + proxy.RemoteSocket.LocalEndPoint + "->SERVER]: ");
             else
                 sb.Append("{" + DateTime.Now.ToLongTimeString() + "} [SERVER->CLIENT " + proxy.LocalSocket.RemoteEndPoint + "]: ");
 

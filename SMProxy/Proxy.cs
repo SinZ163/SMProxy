@@ -120,10 +120,13 @@ namespace SMProxy
             int length = LocalSocket.EndReceive(result, out error);
             if (error != SocketError.Success || !LocalSocket.Connected || length == 0)
             {
+                string log;
                 if (error != SocketError.Success)
-                    LogProvider.Log("Local client " + LocalSocket.RemoteEndPoint + " disconnected: " + error);
+                    log = "Local client " + LocalSocket.RemoteEndPoint + " disconnected: " + error;
                 else
-                    LogProvider.Log("Local client " + LocalSocket.RemoteEndPoint + " disconnected.");
+                    log = "Local client " + LocalSocket.RemoteEndPoint + " disconnected.";
+                LogProvider.Log(log);
+                Console.WriteLine(log);
                 if (RemoteSocket.Connected)
                     RemoteSocket.BeginDisconnect(false, null, null);
                 Connected = false;
@@ -155,10 +158,13 @@ namespace SMProxy
             int length = RemoteSocket.EndReceive(result, out error) + RemoteIndex;
             if (error != SocketError.Success || !RemoteSocket.Connected || length == RemoteIndex)
             {
+                string log;
                 if (error != SocketError.Success)
-                    LogProvider.Log("Remote server " + RemoteSocket.RemoteEndPoint + " disconnected: " + error);
+                    log = "Remote server " + RemoteSocket.RemoteEndPoint + " disconnected: " + error;
                 else
-                    LogProvider.Log("Remote server " + RemoteSocket.RemoteEndPoint + " disconnected.");
+                    log = "Remote server " + RemoteSocket.RemoteEndPoint + " disconnected.";
+                LogProvider.Log(log);
+                Console.WriteLine(log);
                 if (LocalSocket.Connected)
                     LocalSocket.BeginDisconnect(false, null, null);
                 Connected = false;
