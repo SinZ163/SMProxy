@@ -64,14 +64,36 @@ namespace SMProxy
             FieldInfo[] fields = type.GetFields();
             foreach (FieldInfo field in fields)
             {
-                var name = Attribute.GetCustomAttribute(field, typeof(FriendlyNameAttribute)) as FriendlyNameAttribute;
-                if (name == null)
-                    value += "    " + field.Name;
+                var nameAttribute = Attribute.GetCustomAttribute(field, typeof(FriendlyNameAttribute)) as FriendlyNameAttribute;
+                var name = field.Name;
+
+                if (nameAttribute != null)
+                    name = nameAttribute.FriendlyName;
                 else
-                    value += "    " + name.FriendlyName;
-                value += ": " + field.GetValue(this) + "\n";
+                    name = AddSpaces(name);
+
+                value += "    " + name;
+
+                var fValue = field.GetValue(this);
+                string fieldValue = fValue.ToString();
+                if (fValue is byte[])
+                    fieldValue = DataUtility.DumpArray(fValue as byte[]);
+                value += ": " + fieldValue + "\n";
             }
             return value.Remove(value.Length - 1);
+        }
+
+        public static string AddSpaces(string value)
+        {
+            string newValue = "";
+            foreach (char c in value)
+            {
+                if (char.IsLower(c))
+                    newValue += c;
+                else
+                    newValue += " " + c;
+            }
+            return newValue.Substring(1);
         }
     }
 }

@@ -7,8 +7,6 @@ namespace SMProxy
 {
     public class ProxySettings
     {
-        public ProxySettings()
-        {
-        }
+
     }
 }

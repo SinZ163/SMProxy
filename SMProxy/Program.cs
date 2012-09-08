@@ -12,6 +12,7 @@ namespace SMProxy
     {
         public static Socket LocalListener;
         private static IPEndPoint destination;
+        private static string FileName;
 
         static void Main(string[] args)
         {
@@ -28,11 +29,18 @@ namespace SMProxy
             var local = LocalListener.EndAccept(result);
             var remote = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             remote.Connect(destination);
-            string fileName = "log-" + DateTime.Now.ToShortTimeString() + local.RemoteEndPoint + ".txt";
-            fileName = fileName.Replace(':', '-');
-            var proxy = new Proxy(new FileLogProvider(fileName), new ProxySettings());
+
+            var proxy = new Proxy(new FileLogProvider(GetFileName((IPEndPoint)local.RemoteEndPoint)), new ProxySettings());
             proxy.Start(local, remote);
             LocalListener.BeginAccept(AcceptConnection, null);
+        }
+
+        private static string GetFileName(IPEndPoint endPoint)
+        {
+            if (FileName != null)
+                return FileName;
+            var time = DateTime.Now;
+            return "log_" + time.Hour + "-" + time.Minute + "-" + time.Second + "_" + endPoint.Address + ".txt";
         }
     }
 }

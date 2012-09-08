@@ -117,11 +117,11 @@ namespace SMProxy
                 typeof(CloseWindowPacket), // 0x65
                 typeof(ClickWindowPacket), // 0x66
                 typeof(SetSlotPacket), // 0x67
-                null, // 0x68 // Set Window Items
-                null, // 0x69
-                null, // 0x6a
-                null, // 0x6b
-                null, // 0x6c
+                typeof(SetWindowItemsPacket), // 0x68
+                typeof(UpdateWindowPropertyPacket), // 0x69
+                typeof(ConfirmTransactionPacket), // 0x6a
+                typeof(CreativeInventoryActionPacket), // 0x6b
+                typeof(EnchantItemPacket), // 0x6c
                 null, // 0x6d
                 null, // 0x6e
                 null, // 0x6f
@@ -143,9 +143,9 @@ namespace SMProxy
                 null, // 0x7f
                 null, // 0x80
                 null, // 0x81
-                null, // 0x82
-                null, // 0x83
-                null, // 0x84
+                typeof(UpdateSignPacket), // 0x82
+                typeof(ItemDataPacket), // 0x83
+                typeof(UpdateTileEntityPacket), // 0x84
                 null, // 0x85
                 null, // 0x86
                 null, // 0x87
@@ -213,12 +213,12 @@ namespace SMProxy
                 null, // 0xc5
                 null, // 0xc6
                 null, // 0xc7
-                null, // 0xc8
-                null, // 0xc9
-                null, // 0xca
-                null, // 0xcb
-                null, // 0xcc
-                null, // 0xcd
+                typeof(IncrementStatisticPacket), // 0xc8
+                typeof(PlayerListItemPacket), // 0xc9
+                typeof(PlayerAbilitiesPacket), // 0xca
+                typeof(TabCompletePacket), // 0xcb
+                typeof(LocaleAndViewDistancePacket), // 0xcc
+                typeof(ClientStatusPacket), // 0xcd
                 null, // 0xce
                 null, // 0xcf
                 null, // 0xd0
@@ -263,12 +263,12 @@ namespace SMProxy
                 null, // 0xf7
                 null, // 0xf8
                 null, // 0xf9
-                null, // 0xfa
+                typeof(PluginMessagePacket), // 0xfa
                 null, // 0xfb
                 typeof(EncryptionKeyResponsePacket), // 0xfc
                 typeof(EncryptionKeyRequestPacket), // 0xfd
-                null, // 0xfe
-                null  // 0xff
+                typeof(ServerListPingPacket), // 0xfe
+                typeof(DisconnectPacket) // 0xff
             };
 
         #endregion

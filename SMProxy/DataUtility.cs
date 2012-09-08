@@ -36,7 +36,7 @@ namespace SMProxy
             var sb = new StringBuilder((array.Length * 2) + 2);
             foreach (byte b in array)
                 sb.AppendFormat("{0} ", b.ToString("X2"));
-            return sb.ToString().Remove(sb.Length - 1) + "]";
+            return "[" + sb.ToString().Remove(sb.Length - 1) + "]";
         }
 
         public static string DumpArrayPretty(byte[] array)

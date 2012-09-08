@@ -37,6 +37,7 @@ namespace SMProxy.Packets
                 return -1;
             if (!DataUtility.TryReadString(buffer, ref offset, out Line4))
                 return -1;
+            Position = new Vector3(x, y, z);
             return offset;
         }
     }

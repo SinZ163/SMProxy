@@ -12,7 +12,9 @@ namespace SMProxy.Packets
 {
     public class EncryptionKeyResponsePacket : Packet
     {
+        [FriendlyName("Shared Secret (decrypted)")]
         public byte[] SharedSecret;
+        [FriendlyName("Verify Token (decrypted)")]
         public byte[] VerifyToken;
 
         public override byte PacketId
@@ -40,6 +42,8 @@ namespace SMProxy.Packets
             if (PacketContext == PacketContext.ClientToServer)
             {
                 proxy.LocalSharedKey = Proxy.CryptoServiceProvider.Decrypt(SharedSecret, false);
+                SharedSecret = proxy.LocalSharedKey;
+                VerifyToken = Proxy.CryptoServiceProvider.Decrypt(VerifyToken, false);
 
                 // Initialize local encryption
                 proxy.LocalEncrypter = new BufferedBlockCipher(new CfbBlockCipher(new AesFastEngine(), 8));

@@ -28,7 +28,7 @@ namespace SMProxy
                 sb.Append("{" + DateTime.Now.ToLongTimeString() + "} [CLIENT " + proxy.RemoteSocket.RemoteEndPoint + "->SERVER]: ");
             else
                 sb.Append("{" + DateTime.Now.ToLongTimeString() + "} [SERVER->CLIENT " + proxy.LocalSocket.RemoteEndPoint + "]: ");
-            sb.Append(packet.GetType().Name.Replace("Packet", ""));
+            sb.Append(Packet.AddSpaces(packet.GetType().Name.Replace("Packet", "")));
             sb.AppendFormat(" (0x{0})", packet.PacketId.ToString("X2"));
             sb.AppendLine();
             sb.Append(DataUtility.DumpArrayPretty(packet.Payload));
