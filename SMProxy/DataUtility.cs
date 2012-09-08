@@ -179,6 +179,17 @@ namespace SMProxy
             return new[] { (byte)(((Math.Floor(value) % 360) / 360) * 256) };
         }
 
+        public static bool TryReadPackedByte(byte[] buffer, ref int offset, out float value)
+        {
+            value = 0;
+            if (buffer.Length - offset >= 1)
+            {
+                value = (buffer[0] / 256f) * 360f;
+                return true;
+            }
+            return false;
+        }
+
         /// <summary>
         /// Creates a Minecraft-style 64-bit floating-point value.
         /// </summary>
@@ -269,6 +280,16 @@ namespace SMProxy
                 return true;
             }
             return false;
+        }
+
+        public static bool TryReadAbsoluteInteger(byte[] buffer, ref int offset, out double value)
+        {
+            int unconverted;
+            value = 0;
+            if (!TryReadInt32(buffer, ref offset, out unconverted))
+                return false;
+            value = unconverted / 32.0;
+            return true;
         }
 
         /// <summary>

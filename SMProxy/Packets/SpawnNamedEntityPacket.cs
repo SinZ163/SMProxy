@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Craft.Net.Data.Metadata;
 
 namespace SMProxy.Packets
 {
@@ -13,7 +14,7 @@ namespace SMProxy.Packets
         public float Yaw;
         public float Pitch;
         public short CurrentItem;
-        // Metadata
+        public MetadataDictionary Metadata;
 
         public override byte PacketId
         {
@@ -22,7 +23,21 @@ namespace SMProxy.Packets
 
         public override int TryReadPacket(byte[] buffer, int length)
         {
-            throw new NotImplementedException();
+            int offset = 1;
+            double x, y, z;
+            if (!DataUtility.TryReadInt32(buffer, ref offset, out EntityId))
+                return -1;
+            if (!DataUtility.TryReadString(buffer, ref offset, out PlayerName))
+                return -1;
+            if (!DataUtility.TryReadAbsoluteInteger(buffer, ref offset, out x))
+                return -1;
+            if (!DataUtility.TryReadAbsoluteInteger(buffer, ref offset, out y))
+                return -1;
+            if (!DataUtility.TryReadAbsoluteInteger(buffer, ref offset, out z))
+                return -1;
+            if (!MetadataDictionary.TryReadMetadata(buffer, ref offset, out Metadata))
+                return -1;
+            return offset;
         }
     }
 }
