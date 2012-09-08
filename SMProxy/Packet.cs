@@ -72,7 +72,7 @@ namespace SMProxy
                 else
                     name = AddSpaces(name);
 
-                value += "    " + name;
+                value += "    " + name + " (" + field.FieldType.Name + ")";
 
                 var fValue = field.GetValue(this);
                 string fieldValue = fValue.ToString();

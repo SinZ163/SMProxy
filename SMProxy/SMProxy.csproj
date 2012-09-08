@@ -63,6 +63,21 @@
     <Compile Include="FriendlyNameAttribute.cs" />
     <Compile Include="GameMode.cs" />
     <Compile Include="ILogProvider.cs" />
+    <Compile Include="LZMA\Common\CommandLineParser.cs" />
+    <Compile Include="LZMA\Common\CRC.cs" />
+    <Compile Include="LZMA\Common\InBuffer.cs" />
+    <Compile Include="LZMA\Common\OutBuffer.cs" />
+    <Compile Include="LZMA\Compress\LZMA\LzmaBase.cs" />
+    <Compile Include="LZMA\Compress\LZMA\LzmaDecoder.cs" />
+    <Compile Include="LZMA\Compress\LZMA\LzmaEncoder.cs" />
+    <Compile Include="LZMA\Compress\LZ\IMatchFinder.cs" />
+    <Compile Include="LZMA\Compress\LZ\LzBinTree.cs" />
+    <Compile Include="LZMA\Compress\LZ\LzInWindow.cs" />
+    <Compile Include="LZMA\Compress\LZ\LzOutWindow.cs" />
+    <Compile Include="LZMA\Compress\RangeCoder\RangeCoder.cs" />
+    <Compile Include="LZMA\Compress\RangeCoder\RangeCoderBit.cs" />
+    <Compile Include="LZMA\Compress\RangeCoder\RangeCoderBitTree.cs" />
+    <Compile Include="LZMA\ICoder.cs" />
     <Compile Include="Metadata\MetadataByte.cs" />
     <Compile Include="Metadata\MetadataDictionary.cs" />
     <Compile Include="Metadata\MetadataEntry.cs" />
@@ -72,6 +87,7 @@
     <Compile Include="Metadata\MetadataSlot.cs" />
     <Compile Include="Metadata\MetadataString.cs" />
     <Compile Include="Metadata\MetadataVector3.cs" />
+    <Compile Include="Minecraft.cs" />
     <Compile Include="Packet.cs" />
     <Compile Include="PacketReader.cs" />
     <Compile Include="Packets\AnimationPacket.cs" />
@@ -150,10 +166,12 @@
     <Compile Include="Packets\UpdateWindowPropertyPacket.cs" />
     <Compile Include="Packets\UseBedPacket.cs" />
     <Compile Include="Packets\UseEntityPacket.cs" />
+    <Compile Include="PKCSKeyGenerator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Proxy.cs" />
     <Compile Include="ProxySettings.cs" />
+    <Compile Include="RuntimeInfo.cs" />
     <Compile Include="Slot.cs" />
     <Compile Include="Vector3.cs" />
   </ItemGroup>

@@ -7,6 +7,7 @@ using System.Text;
 using System.Net.Sockets;
 using Org.BouncyCastle.Crypto;
 using SMProxy.Packets;
+using System.Diagnostics;
 
 namespace SMProxy
 {
@@ -30,7 +31,6 @@ namespace SMProxy
             LocalEncryptionEnabled = RemoteEncryptionEnabled = false;
             LocalBuffer = new byte[BufferSize];
             RemoteBuffer = new byte[BufferSize];
-            IsLocalRaw = IsRemoteRaw = false;
             LogProvider = logProvider;
             Settings = settings;
         }
@@ -40,13 +40,12 @@ namespace SMProxy
         public bool LocalEncryptionEnabled, RemoteEncryptionEnabled;
         public BufferedBlockCipher LocalEncrypter, LocalDecrypter;
         public BufferedBlockCipher RemoteEncrypter, RemoteDecrypter;
+        public bool Connected { get; set; }
         public ILogProvider LogProvider { get; set; }
         internal byte[] LocalBuffer, RemoteBuffer;
         internal int LocalIndex, RemoteIndex;
         internal byte[] LocalSharedKey, RemoteSharedKey;
         internal byte[] RemoteEncryptionResponse;
-
-        private bool IsLocalRaw, IsRemoteRaw;
 
         /// <summary>
         /// Starts a proxy connection between the two sockets.
@@ -57,7 +56,7 @@ namespace SMProxy
         {
             LocalSocket = localSocket;
             RemoteSocket = remoteSocket;
-
+            Connected = true;
             LocalSocket.BeginReceive(LocalBuffer, 0, LocalBuffer.Length, SocketFlags.None, HandleLocalPackets, null);
             RemoteSocket.BeginReceive(RemoteBuffer, 0, RemoteBuffer.Length, SocketFlags.None, HandleRemotePackets, null);
         }
@@ -69,10 +68,14 @@ namespace SMProxy
             if (error != SocketError.Success || !LocalSocket.Connected || length == LocalIndex)
             {
                 if (error != SocketError.Success)
-                {
-                    // TODO: Log error
-                }
-                // Disconnect
+                    LogProvider.Log("Local client " + LocalSocket.RemoteEndPoint + " disconnected: " + error);
+                else
+                    LogProvider.Log("Local client " + LocalSocket.RemoteEndPoint + " disconnected.");
+                if (RemoteSocket.Connected)
+                    RemoteSocket.BeginDisconnect(false, null, null);
+                Connected = false;
+                if (Settings.SingleSession)
+                    Process.GetCurrentProcess().Kill();
                 return;
             }
             try
@@ -94,7 +97,7 @@ namespace SMProxy
                     }
                     packet.HandlePacket(this);
                     LogProvider.Log(packet, this);
-                    if (RemoteSocket.Connected && !packet.OverrideSendPacket())
+                    if (RemoteSocket.Connected && !packet.OverrideSendPacket() && !Settings.ServerSupressedPackets.Contains(packet.PacketId))
                     {
                         if (RemoteEncryptionEnabled)
                             RemoteSocket.BeginSend(RemoteEncrypter.ProcessBytes(packet.Payload), 0, packet.Payload.Length, SocketFlags.None, null, null);
@@ -107,7 +110,6 @@ namespace SMProxy
             catch (Exception e)
             {
                 LogProvider.Log("Client exception: \"" + e.Message + "\" Switching client to generic TCP proxy");
-                IsLocalRaw = true;
                 LocalSocket.BeginReceive(LocalBuffer, 0, LocalBuffer.Length, SocketFlags.None, HandleLocalRaw, null);
             }
         }
@@ -119,11 +121,14 @@ namespace SMProxy
             if (error != SocketError.Success || !LocalSocket.Connected || length == 0)
             {
                 if (error != SocketError.Success)
-                {
-                    // TODO: Log error
-                    Console.WriteLine("Local error: " + error.ToString());
-                }
-                // Disconnect
+                    LogProvider.Log("Local client " + LocalSocket.RemoteEndPoint + " disconnected: " + error);
+                else
+                    LogProvider.Log("Local client " + LocalSocket.RemoteEndPoint + " disconnected.");
+                if (RemoteSocket.Connected)
+                    RemoteSocket.BeginDisconnect(false, null, null);
+                Connected = false;
+                if (Settings.SingleSession)
+                    Process.GetCurrentProcess().Kill();
                 return;
             }
 
@@ -151,10 +156,14 @@ namespace SMProxy
             if (error != SocketError.Success || !RemoteSocket.Connected || length == RemoteIndex)
             {
                 if (error != SocketError.Success)
-                {
-                    // TODO: Log error
-                }
-                // Disconnect
+                    LogProvider.Log("Remote server " + RemoteSocket.RemoteEndPoint + " disconnected: " + error);
+                else
+                    LogProvider.Log("Remote server " + RemoteSocket.RemoteEndPoint + " disconnected.");
+                if (LocalSocket.Connected)
+                    LocalSocket.BeginDisconnect(false, null, null);
+                Connected = false;
+                if (Settings.SingleSession)
+                    Process.GetCurrentProcess().Kill();
                 return;
             }
             try
@@ -176,7 +185,7 @@ namespace SMProxy
                     }
                     packet.HandlePacket(this);
                     LogProvider.Log(packet, this);
-                    if (LocalSocket.Connected && !packet.OverrideSendPacket())
+                    if (LocalSocket.Connected && !packet.OverrideSendPacket() && !Settings.ClientSupressedPackets.Contains(packet.PacketId))
                     {
                         if (LocalEncryptionEnabled)
                             LocalSocket.BeginSend(LocalEncrypter.ProcessBytes(packet.Payload), 0, packet.Payload.Length, SocketFlags.None, null, null);
@@ -189,7 +198,6 @@ namespace SMProxy
             catch (Exception e)
             {
                 LogProvider.Log("Server exception: \"" + e.Message + "\" Switching server to generic TCP proxy");
-                IsRemoteRaw = true;
                 RemoteSocket.BeginReceive(RemoteBuffer, 0, RemoteBuffer.Length, SocketFlags.None, HandleRemoteRaw, null);
             }
         }
@@ -201,11 +209,14 @@ namespace SMProxy
             if (error != SocketError.Success || !RemoteSocket.Connected || length == 0)
             {
                 if (error != SocketError.Success)
-                {
-                    // TODO: Log error
-                    Console.WriteLine("Remote error: " + error.ToString());
-                }
-                // Disconnect
+                    LogProvider.Log("Remote server " + RemoteSocket.RemoteEndPoint + " disconnected: " + error);
+                else
+                    LogProvider.Log("Remote server " + RemoteSocket.RemoteEndPoint + " disconnected.");
+                if (LocalSocket.Connected)
+                    LocalSocket.BeginDisconnect(false, null, null);
+                Connected = false;
+                if (Settings.SingleSession)
+                    Process.GetCurrentProcess().Kill();
                 return;
             }
 

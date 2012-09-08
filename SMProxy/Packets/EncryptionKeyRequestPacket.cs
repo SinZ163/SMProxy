@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
+using System.Net;
 
 namespace SMProxy.Packets
 {
@@ -56,6 +57,22 @@ namespace SMProxy.Packets
                 .Concat(encryptedSharedSecret)
                 .Concat(DataUtility.CreateInt16((short)encryptedVerify.Length))
                 .Concat(encryptedVerify).ToArray();
+
+            if (ServerId != "-")
+            {
+                // Generate session hash
+                byte[] hashData = Encoding.ASCII.GetBytes(ServerId)
+                    .Concat(proxy.RemoteSharedKey)
+                    .Concat(PublicKey).ToArray();
+                var hash = Cryptography.JavaHexDigest(hashData);
+                var webClient = new WebClient();
+                string result = webClient.DownloadString("http://session.minecraft.net/game/joinserver.jsp?user=" +
+                    Uri.EscapeUriString(proxy.Settings.Username) +
+                    "&sessionId=" + Uri.EscapeUriString(proxy.Settings.UserSession) +
+                    "&serverId=" + Uri.EscapeUriString(hash));
+                if (result != "OK")
+                    Console.WriteLine("Warning: Unable to login as user " + proxy.Settings.Username + ", expect mixed results.");
+            }
 
             // Interact with the local client
             var verifyToken = new byte[4];

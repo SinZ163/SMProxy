@@ -35,6 +35,7 @@ namespace SMProxy.Packets
         {
             if (ProtocolVersion != Proxy.ProtocolVersion)
                 proxy.LogProvider.Log("WARNING: Protocol version provided by client does not match SMProxy version (" + Proxy.ProtocolVersion + ")");
+            proxy.Settings.Username = Username;
         }
     }
 }
