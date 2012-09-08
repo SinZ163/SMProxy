@@ -2,17 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Craft.Net.Data.Metadata;
 
 namespace SMProxy.Packets
 {
-    public class AttachEntity : Packet
+    public class EntityMetadataPacket : Packet
     {
         public int EntityId;
-        public int VehicleId;
+        public MetadataDictionary Metadata;
 
         public override byte PacketId
         {
-            get { return 0x27; }
+            get { return 0x28; }
         }
 
         public override int TryReadPacket(byte[] buffer, int length)
@@ -20,7 +21,7 @@ namespace SMProxy.Packets
             int offset = 1;
             if (!DataUtility.TryReadInt32(buffer, ref offset, out EntityId))
                 return -1;
-            if (!DataUtility.TryReadInt32(buffer, ref offset, out VehicleId))
+            if (!MetadataDictionary.TryReadMetadata(buffer, ref offset, out Metadata))
                 return -1;
             return offset;
         }

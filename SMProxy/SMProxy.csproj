@@ -75,7 +75,7 @@
     <Compile Include="Packet.cs" />
     <Compile Include="PacketReader.cs" />
     <Compile Include="Packets\AnimationPacket.cs" />
-    <Compile Include="Packets\AttachEntity.cs" />
+    <Compile Include="Packets\AttachEntityPacket.cs" />
     <Compile Include="Packets\BlockActionPacket.cs" />
     <Compile Include="Packets\BlockBreakAnimationPacket.cs" />
     <Compile Include="Packets\BlockChangePacket.cs" />
@@ -85,7 +85,10 @@
     <Compile Include="Packets\ClickWindowPacket.cs" />
     <Compile Include="Packets\CloseWindowPacket.cs" />
     <Compile Include="Packets\CollectItemPacket.cs" />
+    <Compile Include="Packets\ConfirmTransactionPacket.cs" />
+    <Compile Include="Packets\CreativeInventoryActionPacket.cs" />
     <Compile Include="Packets\DestroyEntityPacket.cs" />
+    <Compile Include="Packets\EnchantItemPacket.cs" />
     <Compile Include="Packets\EncryptionKeyResponsePacket.cs" />
     <Compile Include="Packets\EncryptionKeyRequestPacket.cs" />
     <Compile Include="Packets\EntityActionPacket.cs" />
@@ -94,7 +97,7 @@
     <Compile Include="Packets\EntityHeadLookPacket.cs" />
     <Compile Include="Packets\EntityLookAndRelativeMovePacket.cs" />
     <Compile Include="Packets\EntityLookPacket.cs" />
-    <Compile Include="Packets\EntityMetadata.cs" />
+    <Compile Include="Packets\EntityMetadataPacket.cs" />
     <Compile Include="Packets\EntityPacket.cs" />
     <Compile Include="Packets\EntityRelativeMovePacket.cs" />
     <Compile Include="Packets\EntityStatusPacket.cs" />
@@ -104,6 +107,7 @@
     <Compile Include="Packets\HandshakePacket.cs" />
     <Compile Include="Packets\HeldItemChangePacket.cs" />
     <Compile Include="Packets\InvalidPacket.cs" />
+    <Compile Include="Packets\ItemDataPacket.cs" />
     <Compile Include="Packets\KeepAlivePacket.cs" />
     <Compile Include="Packets\LightningPacket.cs" />
     <Compile Include="Packets\LoginRequestPacket.cs" />
@@ -121,6 +125,7 @@
     <Compile Include="Packets\RespawnPacket.cs" />
     <Compile Include="Packets\SetExperiencePacket.cs" />
     <Compile Include="Packets\SetSlotPacket.cs" />
+    <Compile Include="Packets\SetWindowItemsPacket.cs" />
     <Compile Include="Packets\SoundOrParticleEffectPacket.cs" />
     <Compile Include="Packets\SpawnDroppedItemPacket.cs" />
     <Compile Include="Packets\SpawnExperienceOrbPacket.cs" />
@@ -131,6 +136,9 @@
     <Compile Include="Packets\SpawnPositionPacket.cs" />
     <Compile Include="Packets\TimeUpdatePacket.cs" />
     <Compile Include="Packets\UpdateHealthPacket.cs" />
+    <Compile Include="Packets\UpdateSignPacket.cs" />
+    <Compile Include="Packets\UpdateTileEntityPacket.cs" />
+    <Compile Include="Packets\UpdateWindowPropertyPacket.cs" />
     <Compile Include="Packets\UseBedPacket.cs" />
     <Compile Include="Packets\UseEntityPacket.cs" />
     <Compile Include="Program.cs" />

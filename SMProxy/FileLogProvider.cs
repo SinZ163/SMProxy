@@ -17,7 +17,7 @@ namespace SMProxy
 
         public void Log(string text)
         {
-            stream.WriteLine(text);
+            stream.WriteLine("{" + DateTime.Now.ToLongTimeString() + "} " + text + Environment.NewLine);
             stream.Flush();
         }
 
@@ -25,15 +25,15 @@ namespace SMProxy
         {
             StringBuilder sb = new StringBuilder();
             if (packet.PacketContext == PacketContext.ClientToServer)
-                sb.Append("{" + DateTime.Now.ToShortTimeString() + "} [CLIENT " + proxy.RemoteSocket.RemoteEndPoint + "->SERVER]: ");
+                sb.Append("{" + DateTime.Now.ToLongTimeString() + "} [CLIENT " + proxy.RemoteSocket.RemoteEndPoint + "->SERVER]: ");
             else
-                sb.Append("{" + DateTime.Now.ToShortTimeString() + "} [SERVER->CLIENT " + proxy.LocalSocket.RemoteEndPoint + "]: ");
+                sb.Append("{" + DateTime.Now.ToLongTimeString() + "} [SERVER->CLIENT " + proxy.LocalSocket.RemoteEndPoint + "]: ");
             sb.Append(packet.GetType().Name.Replace("Packet", ""));
             sb.AppendFormat(" (0x{0})", packet.PacketId.ToString("X2"));
             sb.AppendLine();
             sb.Append(DataUtility.DumpArrayPretty(packet.Payload));
             sb.AppendLine(packet.ToString(proxy));
-            stream.Write(sb.ToString());
+            stream.Write(sb + Environment.NewLine);
             stream.Flush();
         }
 
@@ -41,11 +41,11 @@ namespace SMProxy
         {
             StringBuilder sb = new StringBuilder();
             if (packetContext == PacketContext.ClientToServer)
-                sb.AppendLine("RAW {" + DateTime.Now.ToShortTimeString() + "} [CLIENT " + proxy.RemoteSocket.RemoteEndPoint + "->SERVER]: ");
+                sb.AppendLine("RAW {" + DateTime.Now.ToLongTimeString() + "} [CLIENT " + proxy.RemoteSocket.RemoteEndPoint + "->SERVER]: ");
             else
-                sb.AppendLine("RAW {" + DateTime.Now.ToShortTimeString() + "} [SERVER->CLIENT " + proxy.LocalSocket.RemoteEndPoint + "]: ");
+                sb.AppendLine("RAW {" + DateTime.Now.ToLongTimeString() + "} [SERVER->CLIENT " + proxy.LocalSocket.RemoteEndPoint + "]: ");
             sb.Append(DataUtility.DumpArrayPretty(payload));
-            stream.Write(sb.ToString());
+            stream.Write(sb + Environment.NewLine);
             stream.Flush();
         }
     }

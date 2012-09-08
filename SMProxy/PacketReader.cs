@@ -16,47 +16,47 @@ namespace SMProxy
                 typeof(KeepAlivePacket), // 0x0
                 typeof(LoginRequestPacket), // 0x1
                 typeof(HandshakePacket), // 0x2
-                null, // 0x3
-                null, // 0x4
-                null, // 0x5
-                null, // 0x6
-                null, // 0x7
-                null, // 0x8
-                null, // 0x9
-                null, // 0xa
-                null, // 0xb
-                null, // 0xc
-                null, // 0xd
-                null, // 0xe
-                null, // 0xf
-                null, // 0x10
-                null, // 0x11
-                null, // 0x12
-                null, // 0x13
-                null, // 0x14
-                null, // 0x15
-                null, // 0x16
-                null, // 0x17
-                null, // 0x18
-                null, // 0x19
-                null, // 0x1a
+                typeof(ChatMessagePacket), // 0x3
+                typeof(TimeUpdatePacket), // 0x4
+                typeof(EntityEquipmentPacket), // 0x5
+                typeof(SpawnPositionPacket), // 0x6
+                typeof(UseEntityPacket), // 0x7
+                typeof(UpdateHealthPacket), // 0x8
+                typeof(RespawnPacket), // 0x9
+                typeof(PlayerPacket), // 0xa
+                typeof(PlayerPositionPacket), // 0xb
+                typeof(PlayerLookPacket), // 0xc
+                typeof(PlayerPositionAndLookPacket), // 0xd
+                typeof(PlayerDiggingPacket), // 0xe
+                typeof(PlayerBlockPlacementPacket), // 0xf
+                typeof(HeldItemChangePacket), // 0x10
+                typeof(UseBedPacket), // 0x11
+                typeof(AnimationPacket), // 0x12
+                typeof(EntityActionPacket), // 0x13
+                typeof(SpawnNamedEntityPacket), // 0x14
+                typeof(SpawnDroppedItemPacket), // 0x15
+                typeof(CollectItemPacket), // 0x16
+                typeof(SpawnObjectPacket), // 0x17
+                typeof(SpawnMobPacket), // 0x18
+                typeof(SpawnPaintingPacket), // 0x19
+                typeof(SpawnExperienceOrbPacket), // 0x1a
                 null, // 0x1b
-                null, // 0x1c
-                null, // 0x1d
-                null, // 0x1e
-                null, // 0x1f
-                null, // 0x20
-                null, // 0x21
-                null, // 0x22
-                null, // 0x23
+                typeof(EntityVelocityPacket), // 0x1c
+                typeof(DestroyEntityPacket), // 0x1d
+                typeof(EntityPacket), // 0x1e
+                typeof(EntityRelativeMovePacket), // 0x1f
+                typeof(EntityLookPacket), // 0x20
+                typeof(EntityLookAndRelativeMovePacket), // 0x21
+                typeof(EntityTeleportPacket), // 0x22
+                typeof(EntityHeadLookPacket), // 0x23
                 null, // 0x24
                 null, // 0x25
-                null, // 0x26
-                null, // 0x27
-                null, // 0x28
-                null, // 0x29
-                null, // 0x2a
-                null, // 0x2b
+                typeof(EntityStatusPacket), // 0x26
+                typeof(AttachEntityPacket), // 0x27
+                typeof(EntityMetadataPacket), // 0x28
+                typeof(EntityEffectPacket), // 0x29
+                typeof(RemoveEntityEffectPacket), // 0x2a
+                typeof(SetExperiencePacket), // 0x2b
                 null, // 0x2c
                 null, // 0x2d
                 null, // 0x2e
@@ -64,18 +64,18 @@ namespace SMProxy
                 null, // 0x30
                 null, // 0x31
                 null, // 0x32
-                null, // 0x33
-                null, // 0x34
-                null, // 0x35
-                null, // 0x36
-                null, // 0x37
-                null, // 0x38
+                typeof(ChunkDataPacket), // 0x33
+                typeof(MultiBlockChangePacket), // 0x34
+                typeof(BlockChangePacket), // 0x35
+                typeof(BlockActionPacket), // 0x36
+                typeof(BlockBreakAnimationPacket), // 0x37
+                typeof(MapChunkBulkPacket), // 0x38
                 null, // 0x39
                 null, // 0x3a
                 null, // 0x3b
-                null, // 0x3c
-                null, // 0x3d
-                null, // 0x3e
+                typeof(ExplosionPacket), // 0x3c
+                typeof(SoundOrParticleEffectPacket), // 0x3d
+                typeof(NamedSoundEffectPacket), // 0x3e
                 null, // 0x3f
                 null, // 0x40
                 null, // 0x41
@@ -83,8 +83,8 @@ namespace SMProxy
                 null, // 0x43
                 null, // 0x44
                 null, // 0x45
-                null, // 0x46
-                null, // 0x47
+                typeof(ChangeGameStatePacket), // 0x46
+                typeof(LightningPacket), // 0x47
                 null, // 0x48
                 null, // 0x49
                 null, // 0x4a
@@ -113,11 +113,11 @@ namespace SMProxy
                 null, // 0x61
                 null, // 0x62
                 null, // 0x63
-                null, // 0x64
-                null, // 0x65
-                null, // 0x66
-                null, // 0x67
-                null, // 0x68
+                typeof(OpenWindowPacket), // 0x64
+                typeof(CloseWindowPacket), // 0x65
+                typeof(ClickWindowPacket), // 0x66
+                typeof(SetSlotPacket), // 0x67
+                null, // 0x68 // Set Window Items
                 null, // 0x69
                 null, // 0x6a
                 null, // 0x6b
