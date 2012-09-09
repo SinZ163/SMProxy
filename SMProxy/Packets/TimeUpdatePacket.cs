@@ -8,6 +8,7 @@ namespace SMProxy.Packets
     public class TimeUpdatePacket : Packet
     {
         public long Time;
+        public long DayTime;
 
         public override byte PacketId
         {
@@ -18,6 +19,8 @@ namespace SMProxy.Packets
         {
             int offset = 1;
             if (!DataUtility.TryReadInt64(buffer, ref offset, out Time))
+                return -1;
+            if (!DataUtility.TryReadInt64(buffer, ref offset, out DayTime))
                 return -1;
             return offset;
         }

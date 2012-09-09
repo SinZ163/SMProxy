@@ -13,7 +13,7 @@ namespace SMProxy
 {
     public class Proxy
     {
-        public const int ProtocolVersion = 39;
+        public const int ProtocolVersion = 42;
 
         private const int BufferSize = 4096 * 64; // TODO: Dynamic buffer resizing
         internal static RSAParameters ServerKey;

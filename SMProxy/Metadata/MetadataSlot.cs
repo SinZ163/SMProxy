@@ -8,8 +8,8 @@ namespace Craft.Net.Data.Metadata
 {
     public class MetadataSlot : MetadataEntry
     {
-        public override byte Identifier { get { return 2; } }
-        public override string FriendlyName { get { return "float"; } }
+        public override byte Identifier { get { return 5; } }
+        public override string FriendlyName { get { return "slot"; } }
 
         public Slot Value;
 
@@ -31,6 +31,8 @@ namespace Craft.Net.Data.Metadata
             byte count;
             if (!DataUtility.TryReadUInt16(buffer, ref offset, out id))
                 return false;
+            if (id == 0xFFFF)
+                return true;
             if (!DataUtility.TryReadByte(buffer, ref offset, out count))
                 return false;
             if (!DataUtility.TryReadUInt16(buffer, ref offset, out metadata))

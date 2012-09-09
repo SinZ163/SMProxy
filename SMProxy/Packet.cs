@@ -78,6 +78,8 @@ namespace SMProxy
                 string fieldValue = fValue.ToString();
                 if (fValue is byte[])
                     fieldValue = DataUtility.DumpArray(fValue as byte[]);
+                else if (fValue.GetType().IsArray)
+                    fieldValue = "[" + String.Join(",", (object[])fValue) + "]";
                 value += ": " + fieldValue + "\n";
             }
             if (value.Length == 0)
