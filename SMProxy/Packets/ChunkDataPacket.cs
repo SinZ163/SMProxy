@@ -27,6 +27,8 @@ namespace SMProxy.Packets
                 return -1;
             if (!DataUtility.TryReadInt32(buffer, ref offset, out Z))
                 return -1;
+            if (!DataUtility.TryReadBoolean(buffer, ref offset, out GroundUpContinuous))
+                return -1;
             if (!DataUtility.TryReadUInt16(buffer, ref offset, out PrimaryBitMap))
                 return -1;
             if (!DataUtility.TryReadUInt16(buffer, ref offset, out AddBitMap))

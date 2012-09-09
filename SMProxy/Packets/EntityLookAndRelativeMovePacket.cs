@@ -23,11 +23,11 @@ namespace SMProxy.Packets
             double dX, dY, dZ;
             if (!DataUtility.TryReadInt32(buffer, ref offset, out EntityId))
                 return -1;
-            if (!DataUtility.TryReadAbsoluteInteger(buffer, ref offset, out dX))
+            if (!DataUtility.TryReadAbsoluteByte(buffer, ref offset, out dX))
                 return -1;
-            if (!DataUtility.TryReadAbsoluteInteger(buffer, ref offset, out dY))
+            if (!DataUtility.TryReadAbsoluteByte(buffer, ref offset, out dY))
                 return -1;
-            if (!DataUtility.TryReadAbsoluteInteger(buffer, ref offset, out dZ))
+            if (!DataUtility.TryReadAbsoluteByte(buffer, ref offset, out dZ))
                 return -1;
             if (!DataUtility.TryReadPackedByte(buffer, ref offset, out Yaw))
                 return -1;

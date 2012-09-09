@@ -185,6 +185,7 @@ namespace SMProxy
             if (buffer.Length - offset >= 1)
             {
                 value = (buffer[0] / 256f) * 360f;
+                offset++;
                 return true;
             }
             return false;
@@ -292,6 +293,16 @@ namespace SMProxy
             return true;
         }
 
+        public static bool TryReadAbsoluteByte(byte[] buffer, ref int offset, out double value)
+        {
+            byte unconverted;
+            value = 0;
+            if (!TryReadByte(buffer, ref offset, out unconverted))
+                return false;
+            value = unconverted / 32.0;
+            return true;
+        }
+
         /// <summary>
         /// Attempts to read a Minecraft-style 64-bit integer from the given buffer.
         /// </summary>
@@ -382,7 +393,7 @@ namespace SMProxy
         /// <summary>
         /// Attempts to read an arbituary number of bytes from the given buffer.
         /// </summary>
-        public static bool TryReadArray(byte[] buffer, short length, ref int offset, out byte[] value)
+        public static bool TryReadArray(byte[] buffer, int length, ref int offset, out byte[] value)
         {
             value = null;
             if (buffer.Length - offset < length)

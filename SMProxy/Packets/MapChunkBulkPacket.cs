@@ -24,9 +24,9 @@ namespace SMProxy.Packets
                 return -1;
             if (!DataUtility.TryReadInt32(buffer, ref offset, out dataLength))
                 return -1;
-            if (!DataUtility.TryReadArray(buffer, (short)dataLength, ref offset, out CompressedData))
+            if (!DataUtility.TryReadArray(buffer, dataLength, ref offset, out CompressedData))
                 return -1;
-            if (!DataUtility.TryReadArray(buffer, (short)(chunks * 12), ref offset, out ChunkMetadata))
+            if (!DataUtility.TryReadArray(buffer, chunks * 12, ref offset, out ChunkMetadata))
                 return -1;
             return offset;
         }

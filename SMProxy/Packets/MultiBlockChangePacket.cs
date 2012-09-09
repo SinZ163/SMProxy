@@ -19,7 +19,7 @@ namespace SMProxy.Packets
 
         public override int TryReadPacket(byte[] buffer, int length)
         {
-            int offset = 0;
+            int offset = 1;
             int dataLength;
             if (!DataUtility.TryReadInt32(buffer, ref offset, out ChunkX))
                 return -1;
@@ -29,7 +29,7 @@ namespace SMProxy.Packets
                 return -1;
             if (!DataUtility.TryReadInt32(buffer, ref offset, out dataLength))
                 return -1;
-            if (!DataUtility.TryReadArray(buffer, (short)dataLength, ref offset, out Data)) // TODO: Argument as int
+            if (!DataUtility.TryReadArray(buffer, dataLength, ref offset, out Data))
                 return -1;
             return offset;
         }

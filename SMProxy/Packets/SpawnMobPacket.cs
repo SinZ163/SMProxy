@@ -26,7 +26,7 @@ namespace SMProxy.Packets
         {
             int offset = 1;
             int x, y, z;
-            int velX, velY, velZ;
+            short velX, velY, velZ;
             if (!DataUtility.TryReadInt32(buffer, ref offset, out EntityId))
                 return -1;
             if (!DataUtility.TryReadByte(buffer, ref offset, out Type))
@@ -43,11 +43,11 @@ namespace SMProxy.Packets
                 return -1;
             if (!DataUtility.TryReadPackedByte(buffer, ref offset, out HeadYaw))
                 return -1;
-            if (!DataUtility.TryReadInt32(buffer, ref offset, out velX))
+            if (!DataUtility.TryReadInt16(buffer, ref offset, out velX))
                 return -1;
-            if (!DataUtility.TryReadInt32(buffer, ref offset, out velY))
+            if (!DataUtility.TryReadInt16(buffer, ref offset, out velY))
                 return -1;
-            if (!DataUtility.TryReadInt32(buffer, ref offset, out velZ))
+            if (!DataUtility.TryReadInt16(buffer, ref offset, out velZ))
                 return -1;
             if (!MetadataDictionary.TryReadMetadata(buffer, ref offset, out Metadata))
                 return -1;

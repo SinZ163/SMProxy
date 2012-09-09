@@ -22,7 +22,7 @@ namespace SMProxy.Packets
         public override int TryReadPacket(byte[] buffer, int length)
         {
             int offset = 1;
-            int x, y, z;
+            double x, y, z;
             ushort id, metadata;
             byte count;
             if (!DataUtility.TryReadInt32(buffer, ref offset, out EntityId))
@@ -33,11 +33,11 @@ namespace SMProxy.Packets
                 return -1;
             if (!DataUtility.TryReadUInt16(buffer, ref offset, out metadata))
                 return -1;
-            if (!DataUtility.TryReadInt32(buffer, ref offset, out x))
+            if (!DataUtility.TryReadAbsoluteInteger(buffer, ref offset, out x))
                 return -1;
-            if (!DataUtility.TryReadInt32(buffer, ref offset, out y))
+            if (!DataUtility.TryReadAbsoluteInteger(buffer, ref offset, out y))
                 return -1;
-            if (!DataUtility.TryReadInt32(buffer, ref offset, out z))
+            if (!DataUtility.TryReadAbsoluteInteger(buffer, ref offset, out z))
                 return -1;
             if (!DataUtility.TryReadPackedByte(buffer, ref offset, out Rotation))
                 return -1;

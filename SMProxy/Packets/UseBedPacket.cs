@@ -9,7 +9,7 @@ namespace SMProxy.Packets
     {
         public int EntityId;
         [FriendlyName("[unknown]")]
-        public int Unknown;
+        public byte Unknown;
         public Vector3 Position;
 
         public override byte PacketId
@@ -24,7 +24,7 @@ namespace SMProxy.Packets
             byte y;
             if (!DataUtility.TryReadInt32(buffer, ref offset, out EntityId))
                 return -1;
-            if (!DataUtility.TryReadInt32(buffer, ref offset, out Unknown))
+            if (!DataUtility.TryReadByte(buffer, ref offset, out Unknown))
                 return -1;
             if (!DataUtility.TryReadInt32(buffer, ref offset, out x))
                 return -1;

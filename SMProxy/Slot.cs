@@ -238,5 +238,16 @@ namespace SMProxy
         {
             get { return Id == 0xFFFF || Id == 0; }
         }
+
+        public override string ToString()
+        {
+            if (Empty)
+                return "[Empty slot]";
+            string value = "Id: " + Id + ", Data: " + Metadata + ", Count: " + Count;
+            if (Nbt.RootTag != null)
+                value += ", Nbt: \n" + Nbt.RootTag;
+            value = value.Replace("\n", "\n\t\t").Replace("\t", "    ");
+            return value;
+        }
     }
 }
