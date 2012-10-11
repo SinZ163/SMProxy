@@ -11,6 +11,7 @@ namespace SMProxy.Packets
         public byte ViewDistance;
         public byte ChatFlags;
         public byte Difficulty;
+        public bool ShowCape;
 
         public override byte PacketId
         {
@@ -27,6 +28,8 @@ namespace SMProxy.Packets
             if (!DataUtility.TryReadByte(buffer, ref offset, out ChatFlags))
                 return -1;
             if (!DataUtility.TryReadByte(buffer, ref offset, out Difficulty))
+                return -1;
+            if (!DataUtility.TryReadBoolean(buffer, ref offset, out ShowCape))
                 return -1;
             return offset;
         }

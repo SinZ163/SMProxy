@@ -1,7 +1,7 @@
 SMProxy
 =======
 
-SMProxy is a tool for debugging protocol communication with a Minecraft server, currently supporting Minecraft 1.3.2.
+SMProxy is a tool for debugging protocol communication with a Minecraft server, currently supporting Minecraft 12w41a.
 
 SMProxy runs on Windows with Microsoft.NET and Mono, and on Linux/Mac with Mono.
 
@@ -21,7 +21,7 @@ SMProxy.exe
 This will listen for connections on 127.0.0.1:25564 and log all communication to "output.txt" in the current directory.  When
 you connect a Minecraft client to that address, it will feed all communication through to 127.0.0.1:25565, and create a log
 of that communication in output.txt.  If at any time the client or server attempts to send data that is inconsistent with the
-1.3.2 protocol, the proxy will degrade itself to a generic TCP proxy and output raw communication data.
+12w41a protocol, the proxy will degrade itself to a generic TCP proxy and output raw communication data.
 
 Flags
 -----
