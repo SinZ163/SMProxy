@@ -10,6 +10,7 @@ namespace SMProxy.Packets
         public int EffectId;
         public Vector3 Position;
         public int Data;
+        public Boolean Volume;
 
         public override byte PacketId
         {
@@ -30,6 +31,8 @@ namespace SMProxy.Packets
             if (!DataUtility.TryReadInt32(buffer, ref offset, out z))
                 return -1;
             if (!DataUtility.TryReadInt32(buffer, ref offset, out Data))
+                return -1;
+            if (!DataUtility.TryReadBoolean(buffer, ref offset, out Volume))
                 return -1;
             Position = new Vector3(x, y, z);
             return offset;
